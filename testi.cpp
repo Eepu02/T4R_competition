@@ -1,5 +1,0 @@
-//moi moi
-
-int main() {
-
-}
