@@ -3,12 +3,16 @@
 
 int speed;
 int defaultTraySpeed = 40;
+int defaultLiftSpeed = 100;
+int defaultCollectorSpeed = 30;
 
+// simple sleep function
 void sleep (int x)
 {
   pros::delay(x);
 }
 
+// resets all drive motor internal encoders
 void resetDriveMotors ()
 {
   EtuOikea.tare_position();
@@ -24,6 +28,7 @@ void setup() {
    RampinNostin.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 }
 
+// sensor debugging function
 void printSensorValues() {
   printf("Encoder back: %d\n", encoderBack.get_value());
   printf("Encoder left: %d\n", encoderLeft.get_value());
@@ -66,32 +71,36 @@ double avarage (float x, float y) {
  }
 }*/
 
+// sets speed for right side drive
 void setRightSpeed(int speed)
 {
   EtuOikea.move(speed);
   TakaOikea.move(speed);
 }
 
+// sets speed for left side drive
 void setLeftSpeed(int speed)
 {
   EtuVasen.move(speed);
   TakaVasen.move(speed);
 }
 
+// sets speed for forward-left and backward-right motors
 void setNorthWestSpeed(int speed)
 {
   EtuVasen.move(speed);
   TakaOikea.move(speed);
 }
 
+// sets speeds for forward-right and backward-left motors
 void setNorthEastSpeed(int speed)
 {
   EtuOikea.move(speed);
   TakaVasen.move(speed);
 }
 
-
-void nostinLiike (int YA, int speed = 100)
+// function to control cube collector movement
+void nostinLiike (int YA, int speed = defaultLiftSpeed)
 {
   switch (YA)
   {
@@ -101,44 +110,26 @@ void nostinLiike (int YA, int speed = 100)
   }
 }
 
-void keraajaLiike (int suunta, int speed = 30) {
+// function to control cube collector movement
+void keraajaLiike (int suunta, int speed = defaultCollectorSpeed) {
   switch(suunta) {
-
-    case 1:
-     KerainOikea.move(speed);
-     KerainVasen.move(speed);
-    break;
-
-    case 2:
-     KerainOikea.move(-speed);
-     KerainVasen.move(-speed);
-    break;
-
-    case 3:
-     KerainOikea.move(0);
-     KerainVasen.move(0);
-    break;
+    case 1:   KerainOikea.move(speed);  KerainVasen.move(speed);  break;
+    case 2:   KerainOikea.move(-speed); KerainVasen.move(-speed); break;
+    case 3:   KerainOikea.move(0);      KerainVasen.move(0);      break;
+    default:  printf("Error selecting case for keraajaLiike\n");  break;
   }
 }
 
+// function for controlling cube tray movement
 void RN (int suunta, int speed = defaultTraySpeed) {
   switch (suunta) {
-
-    case 1:
-     RampinNostin.move(speed);
-    break;
-
-    case 2:
-     RampinNostin.move(-speed);
-    break;
-
-    case 3:
-     RampinNostin.move(0);
-    break;
+    case 1:   RampinNostin.move(speed);                 break;
+    case 2:   RampinNostin.move(-speed);                break;
+    case 3:   RampinNostin.move(0);                     break;
+    default:  printf("Error selecting case for RN\n");  break;
   }
 }
 
-// define your global instances of motors and other devices here
 const float dr = 6.3202;//6.34375; //+ 1.25;
 const float dl = -7.62301;//-7.65625; //+ 1.25;
 //const float db = -3.125 + 1.25;
@@ -181,8 +172,8 @@ void updateEncoders() {
   DEb = eb - lastEb;
 }
 
-double getDistance(double degrees) {
-  return M_PI* 3.25* (degrees / 360);
+double getDistance(double degrees, float r = 3.25) {
+  return M_PI* r* (degrees / 360);
 }
 
 double getHeading(bool U = true) {
