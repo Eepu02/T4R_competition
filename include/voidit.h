@@ -2,6 +2,7 @@
 #include "config.h"
 
 int speed;
+int defaultTraySpeed = 40;
 
 void sleep (int x)
 {
@@ -27,7 +28,7 @@ void printSensorValues() {
   printf("Encoder back: %d\n", encoderBack.get_value());
   printf("Encoder left: %d\n", encoderLeft.get_value());
   printf("Encoder right: %d\n", encoderRight.get_value());
-  printf("Bumper: %d\n", bumper.get_value());
+  printf("Bumper: %d\n", Bumper.get_value());
   printf("Pot: %d\n", PotRN.get_value());
   pros::delay(20);
 }
@@ -120,7 +121,7 @@ void keraajaLiike (int suunta, int speed = 30) {
   }
 }
 
-void RN (int suunta, int speed = 40) {
+void RN (int suunta, int speed = defaultTraySpeed) {
   switch (suunta) {
 
     case 1:
