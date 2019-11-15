@@ -64,7 +64,7 @@ void opcontrol() {
   int speed = 80;
   bool slowM = false;
   resetDriveMotors();
-  float NK = 0.8;
+  //float NK = 0.8;
 
   while(1) {
 
