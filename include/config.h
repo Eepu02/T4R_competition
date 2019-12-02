@@ -2,10 +2,10 @@
 
 pros::Controller Controller1(pros::E_CONTROLLER_MASTER);
 pros::Motor TakaVasen(1);
-pros::Motor KerainVasen(6);
+pros::Motor KerainVasen(6, MOTOR_GEARSET_18);
 pros::Motor EtuVasen(5);
 pros::Motor TakaOikea(7, true);
-pros::Motor KerainOikea(8, true);
+pros::Motor KerainOikea(8, MOTOR_GEARSET_18, true);
 pros::Motor EtuOikea(9, true);
 pros::Motor Nostin(10, MOTOR_GEARSET_36, true);
 pros::Motor RampinNostin(11);
