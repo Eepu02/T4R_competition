@@ -4,7 +4,7 @@
 int speed;
 int defaultTraySpeed = 40;
 int defaultLiftSpeed = 100;
-int defaultCollectorSpeed = 30;
+int defaultCollectorSpeed = 90;
 
 // simple sleep function
 void sleep (int x)
