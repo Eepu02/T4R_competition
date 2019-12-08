@@ -77,18 +77,9 @@ void opcontrol() {
      setRightSpeed(Controller1.get_analog(ANALOG_RIGHT_Y));
      setLeftSpeed(Controller1.get_analog(ANALOG_LEFT_Y));
    }
-   else if(Controller1.get_digital(DIGITAL_RIGHT)) {
-     setNorthWestSpeed(speed);
-     setNorthEastSpeed(-speed);
-   }
-   else if(Controller1.get_digital(DIGITAL_LEFT)) {
-     setNorthWestSpeed(-speed);
-     setNorthEastSpeed(speed);
-   }
-   else {
-		 setRightSpeed(Controller1.get_analog(ANALOG_RIGHT_Y));
-     setLeftSpeed(Controller1.get_analog(ANALOG_LEFT_Y));
-    }
+   else if(Controller1.get_digital(DIGITAL_RIGHT)) moveRight(speed);
+   else if(Controller1.get_digital(DIGITAL_LEFT)) moveLeft(speed);
+   else stop();
 
     //kauhan varsien liike
 		//movement of collector lift

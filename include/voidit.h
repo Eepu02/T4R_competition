@@ -35,11 +35,11 @@ void printSensorValues() {
   printf("Encoder right: %d\n", encoderRight.get_value());
   printf("Bumper: %d\n", Bumper.get_value());
   printf("Pot: %d\n", PotRN.get_value());
-  pros::delay(20);
+  pros::delay(100);
 }
 
 double avarage (float x, float y) {
-  return (x+y) /2;
+  return (x + y) / 2;
  }
 
 
@@ -99,6 +99,31 @@ void setNorthEastSpeed(int speed)
   TakaVasen.move(speed);
 }
 
+void moveForward(int speed) {
+  setRightSpeed(speed);
+  setLeftSpeed(speed);
+}
+
+void movedBackward(int speed) {
+  setRightSpeed(speed);
+  setLeftSpeed(speed);
+}
+
+void moveRight(int speed) {
+  setNorthWestSpeed(speed);
+  setNorthEastSpeed(-speed);
+}
+
+void moveLeft(int speed) {
+  setNorthWestSpeed(-speed);
+  setNorthEastSpeed(speed);
+}
+
+void stop() {
+  setRightSpeed(0);
+  setLeftSpeed(0);
+}
+
 // function to control cube collector movement
 void nostinLiike (int YA, int speed = defaultLiftSpeed)
 {
@@ -130,24 +155,35 @@ void RN (int suunta, int speed = defaultTraySpeed) {
   }
 }
 
-const float dr = 6.3202;//6.34375; //+ 1.25;
-const float dl = -7.62301;//-7.65625; //+ 1.25;
-//const float db = -3.125 + 1.25;
+// Tracking wheels' distance to tracking center
+// Values from CAD model
+const float dr = 6.3202;
+const float dl = 7.62301;
+const float db = -3.125 + 1.25;
 
-double er = 0;
-double el = 0;
-double eb = 0;
-double lastEr = er;
-double lastEl = el;
-double lastEb = eb;
-double DEr = er - lastEr;
-double DEl = el - lastEl;
-double DEb = eb - lastEb;
-double suunta = 0.0;
+// Tracking variables
+double er         = 0;
+double el         = 0;
+double eb         = 0;
+double lastEr     = 0;
+double lastEl     = 0;
+double lastEb     = 0;
+double DEr        = er - lastEr;
+double DEl        = el - lastEl;
+double DEb        = eb - lastEb;
+double suunta     = 0.0;
+double dSuunta    = 0.0;
+double lastSuunta = 0.0;
 
 double r = 0;
-double x = 0;
-double y = 0;
+
+// Global x and y
+double xG = 0;
+double yG = 0;
+
+// Local x and y
+double xL = 0;
+double yL = 0;
 
 double error;
 
@@ -160,58 +196,114 @@ void resetEncoders() {
 }
 
 // Updates current and previous encoder values
-void updateEncoders() {
-  lastEr = er;
-  lastEl = el;
-  lastEb = eb;
+void getEncoderValues() {
   er = encoderRight.get_value();
   el = encoderLeft.get_value();
   eb = encoderBack.get_value();
   DEr = er - lastEr;
   DEl = el - lastEl;
   DEb = eb - lastEb;
+  lastEr = er;
+  lastEl = el;
+  lastEb = eb;
 }
 
-double getDistance(double degrees, float r = 3.25) {
-  return M_PI* r* (degrees / 360);
+double getDistance(double degrees, float d = 3.25) {
+  return M_PI * d * (degrees / 360);
 }
 
-double getHeading(bool U = true) {
-  if (U) updateEncoders();
-  double vr = getDistance(DEr);
-  double vl = getDistance(DEl);
-  return (-180* (vl - vr)) / ((dl - dr)* M_PI);
+// Computes the change in orientation since last oriantation
+double getHeading() {
+  // Degress
+  //return (-180 * (getDistance(DEl) - getDistance(DEr))) / ((dl - dr) * M_PI);
+
+  //Radians
+  return (getDistance(DEl) - getDistance(DEr)) / (dr + dl);
 }
 
-void kk (void* p) {
+/* Local axis is offset from global axis by getHeading() / 2!!!*/
+void track() {
  resetDriveMotors();
  resetEncoders();
  while (1) {
+   /*------------------------------------------------------*/
+   /*                                                      */
+   /*                      NEW VALUES                      */
+   /*                                                      */
+   /*------------------------------------------------------*/
+
+   // Gets latest encoder values
+   getEncoderValues();
+
+   // Compute change in orientation
+   dSuunta = getHeading();
+
+   // The new orientation is the previous orientation plus the change
+   suunta += dSuunta;
+
+   /*------------------------------------------------------*/
+   /*                                                      */
+   /*                  LOCAL COORDINATES                   */
+   /*                                                      */
+   /*------------------------------------------------------*/
+
+   // Check if the orientation is the same as last cycle
+   if(lastSuunta == dSuunta) {
+     // Left and right wheel have moved the same distance, so current oriantation is 0
+     yL = getDistance(DEr);
+
+     // Local x-position is simply the back wheel's travel distance
+     xL = getDistance(DEb);
+   }
+   else {
+     // Compute chord lenght
+     yL = 2 * sin(getHeading() / 2) * (DEr / getHeading() + dr);
+
+     //Compute global x and y
+     if(getHeading() == 0) {
+       yG = getDistance(DEl);
+     }
+     else if(getHeading() < 0) {
+       xG = yL * cos(M_PI - (getHeading() / 2) - (M_PI / 2));
+     }
+     else {
+       xG = -yL * cos(M_PI - (getHeading() / 2) - (M_PI / 2));
+     }
+     yG = yL * sin(M_PI - (getHeading() / 2) - (M_PI / 2));
+   }
+
+   /*------------------------------------------------------*/
+   /*                                                      */
+   /*                  GLOBAL COORDINATES                  */
+   /*                                                      */
+   /*------------------------------------------------------*/
+
+   // If global orientation is zero
+   if(suunta == 0) {
+     xG += xL;
+     yG += yL;
+   }
+   else {
+     xG += xL * cos(dSuunta);
+     yG += yL * sin(dSuunta);
+   }
+
+   lastSuunta = dSuunta;
+
+   // Compute translation in local coordinates
+   //xL = 2 * sin(getHeading() / 2) * (DEb / getHeading() + db);
+   //yL = 2 * sin(getHeading() / 2) * (DEr / getHeading() + dr);
+
+   // Compute translation in global coordinates
+   //xG = xL * cos(getHeading() / 2) + yL * sin(getHeading() / 2);
+   //yG = -xL * sin(getHeading() / 2) + yL * cos(getHeading() / 2);
+
    sleep(5);
-   printf( "suunta, %f\n", suunta);
-   printf( " error, %f\n", error);
-   suunta = suunta + getHeading();
-   r = (getDistance(DEl)* 180) / M_PI* getHeading(false);
-
-   double gamma = 180 - (getHeading(false) / 2) - 90;
-   double betta = getHeading(false) / 2;
-   double z =  2* (r* sin(betta));
-
-   x = z* cos(gamma) + x;
-   y = z* sin(gamma) + y;
-
-   printf( "x, %f\n", x);
-   printf( "y, %f\n", y);
-   printf( "r, %f\n", r);
-   printf( "z, %f\n", z);
-   printf( "gamma, %f\n", gamma);
-   printf( "betta, %f\n", betta);
-
  }
 }
 void Mittaus() {
-    std::string text("PROS");
-    pros::Task mittaa(kk, &text, "p");
+    //pros::Task track();
+    //std::thread mittaa (track);
 }
 
 
