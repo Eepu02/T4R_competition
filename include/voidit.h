@@ -2,9 +2,9 @@
 #include "config.h"
 
 int speed;
-int defaultTraySpeed = 100;
-int defaultLiftSpeed = 100;
-int defaultCollectorSpeed = 90;
+#define defaultTraySpeed = 100;
+#define defaultLiftSpeed = 100;
+#define defaultCollectorSpeed = 90;
 
 // simple sleep function
 void sleep (int x)
