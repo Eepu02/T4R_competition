@@ -2,7 +2,7 @@
 #include "config.h"
 
 int speed;
-int defaultTraySpeed = 40;
+int defaultTraySpeed = 100;
 int defaultLiftSpeed = 100;
 int defaultCollectorSpeed = 90;
 

@@ -83,21 +83,21 @@ void opcontrol() {
 
     //kauhan varsien liike
 		//movement of collector lift
-    if (Controller1.get_digital(DIGITAL_R1)) nostinLiike(1);
-    else if (Controller1.get_digital(DIGITAL_R2) && !Bumper.get_value()) nostinLiike(2);
+    if (Controller1.get_digital(DIGITAL_L1)) nostinLiike(1);
+    else if (Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2);
     else nostinLiike(3);
 
     // kerääjän liike
 		// collector movement
-    if (Controller1.get_digital(DIGITAL_X)) keraajaLiike(1);
-    else if (Controller1.get_digital(DIGITAL_A)) keraajaLiike(2);
+    if (Controller1.get_digital(DIGITAL_R1)) keraajaLiike(1);
+    else if (Controller1.get_digital(DIGITAL_R2)) keraajaLiike(2);
     else keraajaLiike(3);
 
 
     // rampin nostimen liike
 		// cube tray movement
-    if (Controller1.get_digital(DIGITAL_L1) && PotRN.get_value() < 4095 ) RN(1);
-    else if (Controller1.get_digital(DIGITAL_L2) && PotRN.get_value() > 1550) RN(2);
+    if (Controller1.get_digital(DIGITAL_UP) && PotRN.get_value() < 4095 ) RN(1);
+    else if (Controller1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > 1550) RN(2);
     else RN(3);
 
 		//printSensorValues();

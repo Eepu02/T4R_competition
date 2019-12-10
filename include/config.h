@@ -8,7 +8,7 @@ pros::Motor TakaOikea(7, true);
 pros::Motor KerainOikea(8, MOTOR_GEARSET_18, true);
 pros::Motor EtuOikea(9, true);
 pros::Motor Nostin(10, MOTOR_GEARSET_36, true);
-pros::Motor RampinNostin(11);
+pros::Motor RampinNostin(11, MOTOR_GEARSET_36);
 
 pros::ADIEncoder encoderBack(1, 2);
 pros::ADIEncoder encoderLeft(3, 4);
