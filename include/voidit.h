@@ -246,7 +246,7 @@ void track() {
    /*                  LOCAL COORDINATES                   */
    /*                                                      */
    /*------------------------------------------------------*/
-
+/*
    // Check if the orientation is the same as last cycle
    if(lastSuunta == dSuunta) {
      // Left and right wheel have moved the same distance, so current oriantation is 0
@@ -270,7 +270,7 @@ void track() {
        xG = -yL * cos(M_PI - (getHeading() / 2) - (M_PI / 2));
      }
      yG = yL * sin(M_PI - (getHeading() / 2) - (M_PI / 2));
-   }
+   }*/
 
    /*------------------------------------------------------*/
    /*                                                      */
@@ -279,14 +279,14 @@ void track() {
    /*------------------------------------------------------*/
 
    // If global orientation is zero
-   if(suunta == 0) {
+   /*if(suunta == 0) {
      xG += xL;
      yG += yL;
    }
    else {
      xG += xL * cos(dSuunta);
      yG += yL * sin(dSuunta);
-   }
+   }*/
 
    lastSuunta = dSuunta;
 
