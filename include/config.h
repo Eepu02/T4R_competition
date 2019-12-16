@@ -1,6 +1,7 @@
 #include "main.h"
 
 pros::Controller Controller1(pros::E_CONTROLLER_MASTER);
+pros::Controller Controller2(pros::E_CONTROLLER_PARTNER);
 pros::Motor TakaVasen(1);
 pros::Motor KerainVasen(6, MOTOR_GEARSET_18);
 pros::Motor EtuVasen(5);

@@ -85,6 +85,9 @@ void opcontrol() {
 		//movement of collector lift
     if (Controller1.get_digital(DIGITAL_L1)) nostinLiike(1);
     else if (Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2);
+		else if (Controller1.get_digital(DIGITAL_UP) && PotRN.get_value() > 1500) {
+			if(PotRN.get_value() < 1800) nostinLiike(1);
+		}
     else nostinLiike(3);
 
     // kerääjän liike
@@ -103,5 +106,7 @@ void opcontrol() {
 		//printSensorValues();
 
    	sleep(20);
+
+		//toinen ohjain, jos käytämme
  }
 }
