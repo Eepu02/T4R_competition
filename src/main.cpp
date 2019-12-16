@@ -65,6 +65,7 @@ void opcontrol() {
   bool slowM = false;
   resetDriveMotors();
   //float NK = 0.8;
+	track();
 
   while(1) {
 
