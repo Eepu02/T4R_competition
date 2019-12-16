@@ -85,8 +85,9 @@ void opcontrol() {
 		//movement of collector lift
     if (Controller1.get_digital(DIGITAL_L1)) nostinLiike(1);
     else if (Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2);
-		else if (Controller1.get_digital(DIGITAL_UP) && PotRN.get_value() > 1500) {
-			if(PotRN.get_value() < 1800) nostinLiike(1);
+		else if (Controller1.get_digital(DIGITAL_UP) &&
+		 					PotRN.get_value() > 1500 && Bumper.get_value()) {
+			if(PotRN.get_value() < 1700) nostinLiike(1);
 		}
     else nostinLiike(3);
 
@@ -102,7 +103,7 @@ void opcontrol() {
     if (Controller1.get_digital(DIGITAL_UP) && PotRN.get_value() < 4095 ) RN(1);
     else if (Controller1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > 1550) RN(2);
     else RN(3);
-
+//gghgjh
 		//printSensorValues();
 
    	sleep(20);
