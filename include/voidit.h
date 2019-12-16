@@ -2,9 +2,9 @@
 #include "config.h"
 
 int speed;
-#define defaultTraySpeed = 100;
-#define defaultLiftSpeed = 100;
-#define defaultCollectorSpeed = 90;
+int defaultTraySpeed = 100;
+int defaultLiftSpeed = 100;
+int defaultCollectorSpeed = 90;
 
 // simple sleep function
 void sleep (int x)
@@ -26,6 +26,7 @@ void setup() {
    KerainOikea.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
    Nostin.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
    RampinNostin.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
 }
 
 // sensor debugging function
