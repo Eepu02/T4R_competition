@@ -242,6 +242,8 @@ void track() {
    // The new orientation is the previous orientation plus the change
    suunta += dSuunta;
 
+   printf("Kulma: %f\n", suunta * (180 / M_PI));
+
    /*------------------------------------------------------*/
    /*                                                      */
    /*                  LOCAL COORDINATES                   */
@@ -349,7 +351,7 @@ void turn (bool slow, float degree, int speed) {
  //}
 
 void G () {
-  Mittaus();
+track();
  while (1) {
    sleep(5);
   }
