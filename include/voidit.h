@@ -226,6 +226,8 @@ double getHeading() {
 void track() {
  resetDriveMotors();
  resetEncoders();
+ double = globalX;
+ double = globalY;
  while (1) {
    /*------------------------------------------------------*/
    /*                                                      */
@@ -244,6 +246,20 @@ void track() {
 
    printf("Kulma: %f\n", suunta * (180 / M_PI));
 
+   double gamma = M_PI - (M_PI/4) - (dSuunta/2);
+
+   double radius = 0;
+
+   double line = 2* (sin(dSuunta/2)*radius);
+
+   double currentX = line*cos(gamma);
+   double currentY = line*sin(gamma);
+
+   globalX += currentX;
+   globalY += currentY;
+
+   printf("X: %f\n", globalX);
+   printf("Y: %f\n", globalY);
    /*------------------------------------------------------*/
    /*                                                      */
    /*                  LOCAL COORDINATES                   */
