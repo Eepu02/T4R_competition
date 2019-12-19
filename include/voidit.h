@@ -3,7 +3,7 @@
 
 int speed;
 int defaultTraySpeed = 100;
-int defaultLiftSpeed = 100;
+int defaultLiftSpeed = 127;
 int defaultCollectorSpeed = 90;
 
 // simple sleep function
@@ -106,8 +106,8 @@ void moveForward(int speed) {
 }
 
 void movedBackward(int speed) {
-  setRightSpeed(speed);
-  setLeftSpeed(speed);
+  setRightSpeed(-speed);
+  setLeftSpeed(-speed);
 }
 
 void moveRight(int speed) {
@@ -371,5 +371,41 @@ void G () {
 track();
  while (1) {
    sleep(5);
+  }
+}
+
+void PID(float target) {
+  float kp = 0.0;
+  float ki = 0.0;
+  float kd = 0.0;
+
+  float currentVal = 0.0;
+  float lastError;
+  float totalError = 0.0;
+  float speed = 0.0;
+
+  while(1) {
+    // Get latest values
+    currentVal = (getDistance(encoderLeft.get_value()) + getDistance(encoderRight.get_value())) / 2;
+
+    // Compute error for proportional term
+    float error = target - currentVal;
+
+    // Compute total error for integral term
+    totalError += error;
+
+    // Compute chane in error for derivative term
+    float diffError = lastError - error;
+
+    // Compute speed
+    speed = error * kp + totalError * ki + diffError * kd;
+
+    if(speed > 127) speed = 127;
+    else if(speed < -127) speed = -127;
+
+    moveForward(speed);
+
+    sleep(20);
+
   }
 }
