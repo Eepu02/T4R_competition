@@ -62,10 +62,11 @@ void autonomous() {}
 void opcontrol() {
 
   int speed = 80;
+	int Nspeed = 100;
   bool slowM = false;
   resetDriveMotors();
   //float NK = 0.8;
-	track();
+	// track();
 
   while(1) {
 
@@ -84,13 +85,17 @@ void opcontrol() {
 
     //kauhan varsien liike
 		//movement of collector lift
-    if (Controller1.get_digital(DIGITAL_L1)) nostinLiike(1);
-    else if (Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2);
+    if (Controller1.get_digital(DIGITAL_L1)) nostinLiike(1, Nspeed);
+    else if (Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2, Nspeed);
 		else if (Controller1.get_digital(DIGITAL_UP) &&
 		 					PotRN.get_value() > 1500 && Bumper.get_value()) {
-			if(PotRN.get_value() < 1700) nostinLiike(1);
+			if(PotRN.get_value() < 1700) nostinLiike(1, Nspeed);
 		}
     else nostinLiike(3);
+
+	//	if (PotRN.get_value() > 1700 &&  Controller1.get_digital(DIGITAL_L1)) {
+    //Nspeed = - 5;
+//	}
 
     // kerääjän liike
 		// collector movement
@@ -104,7 +109,7 @@ void opcontrol() {
     if (Controller1.get_digital(DIGITAL_UP) && PotRN.get_value() < 4095 ) RN(1);
     else if (Controller1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > 1550) RN(2);
     else RN(3);
-//gghgjh
+
 		//printSensorValues();
 
    	sleep(20);

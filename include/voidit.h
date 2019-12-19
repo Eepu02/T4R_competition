@@ -226,8 +226,8 @@ double getHeading() {
 void track() {
  resetDriveMotors();
  resetEncoders();
- double = globalX;
- double = globalY;
+ double  globalX;
+ double  globalY;
  while (1) {
    /*------------------------------------------------------*/
    /*                                                      */
@@ -258,8 +258,9 @@ void track() {
    globalX += currentX;
    globalY += currentY;
 
-   printf("X: %f\n", globalX);
-   printf("Y: %f\n", globalY);
+   //printf("X: %f\n", globalX);
+   //printf("Y: %f\n", globalY);
+   //printf(20, 160, "Y: %f", globalY);
    /*------------------------------------------------------*/
    /*                                                      */
    /*                  LOCAL COORDINATES                   */
