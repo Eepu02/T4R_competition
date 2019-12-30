@@ -20,8 +20,8 @@ void secController () {
        setRightSpeed(Controller1.get_analog(ANALOG_RIGHT_Y));
        setLeftSpeed(Controller1.get_analog(ANALOG_LEFT_Y));
      }
-     else if(Controller1.get_digital(DIGITAL_RIGHT)) moveRight(speed);
-     else if(Controller1.get_digital(DIGITAL_LEFT)) moveLeft(speed);
+     if(Controller1.get_digital(DIGITAL_RIGHT) || Controller2.get_digital(DIGITAL_RIGHT)) moveRight(speed);
+     else if(Controller1.get_digital(DIGITAL_LEFT) || Controller2.get_digital(DIGITAL_LEFT)) moveLeft(speed);
      else stop();
 
       //kauhan varsien liike
@@ -40,7 +40,7 @@ void secController () {
   		// collector movement
       if (Controller1.get_digital(DIGITAL_R1) ||
           Controller2.get_digital(DIGITAL_R1))  keraajaLiike(1);
-      else if (Controller1.get_digital(DIGITAL_R2) || 
+      else if (Controller1.get_digital(DIGITAL_R2) ||
                Controller2.get_digital(DIGITAL_R2)) keraajaLiike(2);
       else keraajaLiike(3);
 

@@ -1,6 +1,7 @@
 #include "main.h"
 //#include "config.h"
 #include "voidit.h"
+#include "eitoimi500.h"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -44,8 +45,10 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
 
+liikuPisteeseen(200, 100, 50);
+}
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -79,23 +82,30 @@ void opcontrol() {
      setRightSpeed(Controller1.get_analog(ANALOG_RIGHT_Y));
      setLeftSpeed(Controller1.get_analog(ANALOG_LEFT_Y));
    }
-   else if(Controller1.get_digital(DIGITAL_RIGHT)) moveRight(speed);
+/*
+	 else if (Controller1.get_analog(ANALOG_LEFT_X) > 5 ){
+     moveRight(abs(Controller1.get_analog(ANALOG_LEFT_X)));
+	 }
+	 else if (Controller1.get_analog(ANALOG_LEFT_X) < 5 ){
+     moveLeft(abs(Controller1.get_analog(ANALOG_LEFT_X)));
+	 }
+	 */
+	 else if(Controller1.get_digital(DIGITAL_RIGHT)) moveRight(speed);
    else if(Controller1.get_digital(DIGITAL_LEFT)) moveLeft(speed);
    else stop();
 
     //kauhan varsien liike
 		//movement of collector lift
-    if (Controller1.get_digital(DIGITAL_L1)) nostinLiike(1, Nspeed);
-    else if (Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2, Nspeed);
+
+    if (Controller1.get_digital(DIGITAL_L1)) nostinLiike(1);
+    else if (Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2);
 		else if (Controller1.get_digital(DIGITAL_UP) &&
 		 					PotRN.get_value() > 1500 && Bumper.get_value()) {
-			if(PotRN.get_value() < 1700) nostinLiike(1, Nspeed);
+			if(PotRN.get_value() < 1800) nostinLiike(1);
 		}
     else nostinLiike(3);
 
-	//	if (PotRN.get_value() > 1700 &&  Controller1.get_digital(DIGITAL_L1)) {
-    //Nspeed = - 5;
-//	}
+
 
     // kerääjän liike
 		// collector movement
@@ -106,8 +116,10 @@ void opcontrol() {
 
     // rampin nostimen liike
 		// cube tray movement
-    if (Controller1.get_digital(DIGITAL_UP) && PotRN.get_value() < 4095 ) RN(1);
-    else if (Controller1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > 1550) RN(2);
+		if (PotRN.get_value() > 2800 &&  Controller1.get_digital(DIGITAL_UP)) Nspeed = Nspeed - 0.2;
+		else Nspeed = 100;
+    if (Controller1.get_digital(DIGITAL_UP) && PotRN.get_value() < 4095 ) RN(1, Nspeed);
+    else if (Controller1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > 1550) RN(2, Nspeed);
     else RN(3);
 
 		//printSensorValues();

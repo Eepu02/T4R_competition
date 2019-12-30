@@ -4,7 +4,7 @@
 int speed;
 int defaultTraySpeed = 100;
 int defaultLiftSpeed = 127;
-int defaultCollectorSpeed = 90;
+int defaultCollectorSpeed = 127;
 
 // simple sleep function
 void sleep (int x)
@@ -139,8 +139,8 @@ void nostinLiike (int YA, int speed = defaultLiftSpeed)
 // function to control cube collector movement
 void keraajaLiike (int suunta, int speed = defaultCollectorSpeed) {
   switch(suunta) {
-    case 1:   KerainOikea.move(speed);  KerainVasen.move(speed);  break;
-    case 2:   KerainOikea.move(-speed); KerainVasen.move(-speed); break;
+    case 1:   KerainOikea.move(speed); KerainVasen.move(speed); break;
+    case 2:   KerainOikea.move(-speed);  KerainVasen.move(-speed);  break;
     case 3:   KerainOikea.move(0);      KerainVasen.move(0);      break;
     default:  printf("Error selecting case for keraajaLiike\n");  break;
   }
@@ -362,6 +362,7 @@ void turn (bool slow, float degree, int speed) {
   }
 }
 
+
 //void my_task_fn(void* param) {
      //std::cout << Hello << (char*)param << std::endl;
      // ...
@@ -373,6 +374,7 @@ track();
    sleep(5);
   }
 }
+
 
 void PID(float target) {
   float kp = 0.0;
@@ -408,4 +410,22 @@ void PID(float target) {
     sleep(20);
 
   }
+}
+
+
+void suoraan (int nopeus, int aste, int k)  {
+double current = suunta;
+int l =0;
+do {
+ moveForward(speed);
+if (suunta > current) {
+    setRightSpeed(speed + 10);
+    setLeftSpeed(speed -5);
+}
+else if (suunta < current){
+    setRightSpeed(speed- 5);
+    setLeftSpeed(speed + 10);
+}
+
+}while(k < l);
 }
