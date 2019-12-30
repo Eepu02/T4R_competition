@@ -2,9 +2,9 @@
 #include "config.h"
 
 int speed;
-int defaultTraySpeed = 100;
+int defaultTraySpeed = 127;
 int defaultLiftSpeed = 127;
-int defaultCollectorSpeed = 90;
+int defaultCollectorSpeed = 127;
 
 // simple sleep function
 void sleep (int x)
@@ -408,4 +408,31 @@ void PID(float target) {
     sleep(20);
 
   }
+}
+
+void arcadeDrive() {
+    int Y1, X1;          // Vertical, Horizontal Joystick Values
+    int rotation;        // Rotation Joystick Values
+    int deadband = 20;   // Threshold value for deadzone
+
+    while (true) {     // Get value of three joysticks used for speed and
+                       // direction.
+                       // Other platforms may have different code for this.
+
+      Y1 = Controller1.get_analog(ANALOG_RIGHT_Y); // Vertical   axis
+      X1 = Controller1.get_analog(ANALOG_RIGHT_X);  // Horizontal axis<
+      rotation = Controller1.get_analog(ANALOG_LEFT_X); // Rotation   axis
+
+      // Implement dead zones to compensate for joystick values
+      // not always returning to zero
+      if (abs(Y1) < deadband) Y1 = 0;
+      if (abs(X1) < deadband) X1 = 0;
+      if (abs(rotation) < deadband) rotation = 0;
+
+      // Convert joystick values to motor speeds
+      EtuOikea.move(Y1 - X1 - rotation);
+      TakaOieka.move(Y1 + X1 - rotation);
+      EtuVasen.move(Y1 + X1 + rotation);
+      TakaVasen.move(Y1 - X1 + rotation);
+    }
 }
