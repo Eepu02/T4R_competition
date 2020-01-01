@@ -47,7 +47,7 @@ void competition_initialize() {}
  */
 void autonomous() {
 
-liikuPisteeseen(200, 100, 50);
+//liikuPisteeseen(200, 100, 50);
 }
 /**
  * Runs the operator control code. This function will be started in its own task

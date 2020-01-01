@@ -413,31 +413,34 @@ void PID(float target) {
 }
 
 
-void suoraan (int nopeus, int aste, int k)  {
-double current = suunta;
-int l =0;
-do {
- moveForward(speed);
-if (suunta > current) {
-    setRightSpeed(speed + 10);
-    setLeftSpeed(speed -5);
-}
-else if (suunta < current){
-    setRightSpeed(speed- 5);
-    setLeftSpeed(speed + 10);
-}
+// VOID SUORAAN (INT NOPEUS, INT ASTE, INT K)  {
+// DOUBLE CURRENT = SUUNTA;
+// INT L =0;
+// DO {
+//  MOVEFORWARD(SPEED);
+// IF (SUUNTA > CURRENT) {
+//     SETRIGHTSPEED(SPEED + 10);
+//     SETLEFTSPEED(SPEED -5);
+// }
+// ELSE IF (SUUNTA < CURRENT){
+//     SETRIGHTSPEED(SPEED- 5);
+//     SETLEFTSPEED(SPEED + 10);
+// }
+//
+// }WHILE(K < L);
+// }
 
-}while(k < l);
-}
-
+/* Code by Rick Swan and Roger Tang */
+/* "A look at holonomic locomotion": https://www.servomagazine.com/magazine/article/a-look-at-holonomic-locomotion */
+/* Modified for use in PROS */
 void arcadeDrive() {
     int Y1, X1;          // Vertical, Horizontal Joystick Values
     int rotation;        // Rotation Joystick Values
     int deadband = 20;   // Threshold value for deadzone
 
-    while (true) {     // Get value of three joysticks used for speed and
-                       // direction.
-                       // Other platforms may have different code for this.
+    // Get value of three joysticks used for speed and direction.
+    // Other platforms may have different code for this.
+    while (true) {
 
       Y1 = Controller1.get_analog(ANALOG_RIGHT_Y); // Vertical   axis
       X1 = Controller1.get_analog(ANALOG_RIGHT_X);  // Horizontal axis<
@@ -451,7 +454,7 @@ void arcadeDrive() {
 
       // Convert joystick values to motor speeds
       EtuOikea.move(Y1 - X1 - rotation);
-      TakaOieka.move(Y1 + X1 - rotation);
+      TakaOikea.move(Y1 + X1 - rotation);
       EtuVasen.move(Y1 + X1 + rotation);
       TakaVasen.move(Y1 - X1 + rotation);
     }
