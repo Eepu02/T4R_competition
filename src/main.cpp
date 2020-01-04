@@ -49,22 +49,6 @@ void competition_initialize() {
  * from where it left off.
  */
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
-void autonomous() {
-
-//liikuPisteeseen(200, 100, 50);
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 void autonomous() {
 win = false;
 eneble = false;
