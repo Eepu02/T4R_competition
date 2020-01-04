@@ -1,10 +1,13 @@
 #include "main.h"
 #include "config.h"
+#include "pros/api_legacy.h"
 
 int speed;
 int defaultTraySpeed = 127;
 int defaultLiftSpeed = 127;
 int defaultCollectorSpeed = 127;
+bool win;
+bool eneble;
 
 // simple sleep function
 void sleep (int x)
@@ -321,16 +324,10 @@ void track() {
    sleep(5);
  }
 }
-void Mittaus() {
-    //pros::Task track();
-    //std::thread mittaa (track);
-}
-
 
 void turn (bool slow, float degree, int speed) {
   double raja = 0.2;
   int minSpeed = 5;
-  Mittaus();
   error = (suunta - degree);
   if (degree < error) {
     do {
@@ -412,24 +409,6 @@ void PID(float target) {
   }
 }
 
-
-void suoraan (int nopeus, int aste, int k)  {
-double current = suunta;
-int l =0;
-do {
- moveForward(speed);
-if (suunta > current) {
-    setRightSpeed(speed + 10);
-    setLeftSpeed(speed -5);
-}
-else if (suunta < current){
-    setRightSpeed(speed- 5);
-    setLeftSpeed(speed + 10);
-}
-
-}while(k < l);
-}
-
 void arcadeDrive() {
     int Y1, X1;          // Vertical, Horizontal Joystick Values
     int rotation;        // Rotation Joystick Values
@@ -451,8 +430,86 @@ void arcadeDrive() {
 
       // Convert joystick values to motor speeds
       EtuOikea.move(Y1 - X1 - rotation);
-      TakaOieka.move(Y1 + X1 - rotation);
+      TakaOikea.move(Y1 + X1 - rotation);
       EtuVasen.move(Y1 + X1 + rotation);
       TakaVasen.move(Y1 - X1 + rotation);
     }
+}
+
+
+void forward(float etaisyys, int angle, int speed, float speedScale = 0.97) {
+
+    double gyroValue;
+    float kuljettumatka;
+    double error;
+    resetEncoders();
+
+    do {
+      getEncoderValues();
+      gyroValue = suunta;
+      error = angle - gyroValue;
+      kuljettumatka = avarage(getDistance(er), getDistance(el));
+
+      moveForward(speed);
+
+      if (error > 0)
+      {
+          setLeftSpeed(speed);
+          setRightSpeed(speed * speedScale);
+      }
+      else if (error < 0)
+      {
+          setLeftSpeed(speed * speedScale);
+          setRightSpeed(speed);
+       }
+    else moveForward(speed);
+
+     double matkaaJaljella = etaisyys - kuljettumatka;
+
+     if(matkaaJaljella < 360 * 2) speed = matkaaJaljella * 0.1388;
+     if(speed > 100) speed = 100;
+     else if(speed < 2) speed = 2;
+
+     sleep(30);
+
+  }while (etaisyys >= kuljettumatka);
+  stop();
+}
+// drives straight backward using cm
+void backward(float etaisyys, int angle, int speed, bool stopMotors = true, float speedScale = 0.97)
+{
+    double gyroValue;
+    double error;
+    float kuljettumatka;
+
+    resetEncoders();
+    do {
+        gyroValue = suunta;
+        kuljettumatka = avarage(getDistance(er), getDistance(el));
+        error = angle - gyroValue;
+
+    movedBackward(speed);
+
+    if (error > 0)
+    {
+        setLeftSpeed(-speed);
+        setRightSpeed(-speed * speedScale);
+    }
+    else if (error < 0)
+    {
+        setLeftSpeed(-speed * speedScale);
+        setRightSpeed(-speed);
+    }
+    else movedBackward(speed);
+
+    double matkaaJaljella = etaisyys - kuljettumatka;
+
+     if(matkaaJaljella < 360 * 2) speed = matkaaJaljella * 0.1388;
+     if(speed > 100) speed = 100;
+     else if(speed < 2) speed = 2;
+
+    sleep(30);
+
+  }while (etaisyys >= kuljettumatka);
+  stop();
 }
