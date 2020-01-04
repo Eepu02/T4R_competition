@@ -229,8 +229,9 @@ double getHeading() {
 void track() {
  resetDriveMotors();
  resetEncoders();
- double  globalX;
- double  globalY;
+ double  globalX = 0;
+ double  globalY = 0;
+ double radius = 0;
  while (1) {
    /*------------------------------------------------------*/
    /*                                                      */
@@ -251,7 +252,8 @@ void track() {
 
    double gamma = M_PI - (M_PI/4) - (dSuunta/2);
 
-   double radius = 0;
+   if(dSuunta == 0) radius = 0;
+   else radius = (getDistance(DEr) / dSuunta) + dr;
 
    double line = 2* (sin(dSuunta/2)*radius);
 
@@ -260,6 +262,9 @@ void track() {
 
    globalX += currentX;
    globalY += currentY;
+
+   printf("Y: %f\n", globalY);
+   printf("X: %f\n", globalX);
 
    //printf("X: %f\n", globalX);
    //printf("Y: %f\n", globalY);
@@ -324,6 +329,10 @@ void track() {
    sleep(5);
  }
 }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
 void turn (bool slow, float degree, int speed) {
   double raja = 0.2;
@@ -385,7 +394,7 @@ void PID(float target) {
 
   while(1) {
     // Get latest values
-    currentVal = (getDistance(encoderLeft.get_value()) + getDistance(encoderRight.get_value())) / 2;
+    currentVal = avarage(getDistance(encoderLeft.get_value()), getDistance(encoderRight.get_value()));
 
     // Compute error for proportional term
     float error = target - currentVal;
@@ -409,12 +418,16 @@ void PID(float target) {
   }
 }
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 void arcadeDrive() {
     int Y1, X1;          // Vertical, Horizontal Joystick Values
     int rotation;        // Rotation Joystick Values
     int deadband = 20;   // Threshold value for deadzone
 
-    while (true) {     // Get value of three joysticks used for speed and
+       // Get value of three joysticks used for speed and
                        // direction.
                        // Other platforms may have different code for this.
 
@@ -433,7 +446,96 @@ void arcadeDrive() {
       TakaOikea.move(Y1 + X1 - rotation);
       EtuVasen.move(Y1 + X1 + rotation);
       TakaVasen.move(Y1 - X1 + rotation);
+
+}
+
+
+void forward(float etaisyys, int angle, int speed, bool stopMotors = true, float speedScale = 0.97)
+{
+    double gyroValue;
+    double error;
+    float kuljettumatka;
+    resetEncoders();
+
+    do {
+      getEncoderValues();
+
+      float NytEtaisyys = getDistance(el, er);
+      gyroValue = suunta;
+      error = angle - gyroValue;
+      float kuljettumatka = (etaisyys - NytEtaisyys);
+    /*  Brain.Screen.printAt(45, 45, "Virhe: %f", error);
+      Brain.Screen.printAt(45, 135, "Gyro: %f", gyroValue);
+      Brain.Screen.printAt(45, 180, "kuljettumatka: %f", kuljettumatka);*/
+      sleep(300);
+
+      moveForward(speed);
+
+      if (error > 0)
+      {
+          setLeftSpeed(speed);
+          setRightSpeed(speed * speedScale);
+      }
+      else if (error < 0)
+      {
+          setLeftSpeed(speed * speedScale);
+          setRightSpeed(speed);
+       }
+    else moveForward(speed);
+
+     double matkaaJaljella = etaisyys - fabs(kuljettumatka);
+
+     if(matkaaJaljella < 360 * 2) speed = matkaaJaljella * 0.1388;
+     if(speed > 100) speed = 100;
+     else if(speed < 2) speed = 2;
+
+     sleep(30);
+
+
+  }while (etaisyys >= fabs(kuljettumatka));
+  stop();
+}
+// drives straight backward using cm
+void backward(float etaisyys, int angle, int speed, bool stopMotors = true, float speedScale = 0.97)
+{
+    double gyroValue;
+    double error;
+    float kuljettumatka;
+    resetEncoders();
+    do {
+        float NytEtaisyys = getDistance(el, er);
+        gyroValue = suunta;
+        error = angle - gyroValue;
+        float kuljettumatka = (etaisyys - NytEtaisyys);
+        /*Brain.Screen.printAt(45, 45, "Virhe: %f", error);
+        Brain.Screen.printAt(45, 135, "Gyro: %f", gyroValue);
+        Brain.Screen.printAt(45, 180, "kuljettumatka: %f", kuljettumatka);*/
+        sleep(300);
+
+    movedBackward(speed);
+
+    if (error > 0)
+    {
+        setLeftSpeed(-speed);
+        setRightSpeed(-speed * speedScale);
     }
+    else if (error < 0)
+    {
+        setLeftSpeed(-speed * speedScale);
+        setRightSpeed(-speed);
+    }
+    else movedBackward(speed);
+
+     double matkaaJaljella = etaisyys - fabs(kuljettumatka);
+
+     if(matkaaJaljella < 360 * 2) speed = matkaaJaljella * 0.1388;
+     if(speed > 100) speed = 100;
+     else if(speed < 2) speed = 2;
+
+    sleep(30);
+
+  }while (etaisyys >= fabs(kuljettumatka));
+  stop();
 }
 
 

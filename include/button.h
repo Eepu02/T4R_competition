@@ -20,6 +20,10 @@ I, robonxt, has provided a basic templete, but you'll need to modify the code to
 #include "voidit.h"
 #include "pros/misc.h"
 //create object Win of the Competition class because we are going to win. Period.
+<<<<<<< Updated upstream
+=======
+vex::competition Win;
+>>>>>>> Stashed changes
 
 /*------------------------------------------------------------------------------------------------------
 [GLOBAL] Variables for GUI > Constant vars that won't change during program run
@@ -40,14 +44,20 @@ I, robonxt, has provided a basic templete, but you'll need to modify the code to
 #define btnL2				12
 
 //Define delays
+<<<<<<< Updated upstream
 #define bounceDelay				20 //Time to wait between reads to check for key bounce
 #define refreshDelay			200 //Time to wait between refreshing screens
+=======
+#define bounceDelay		20 //Time to wait between reads to check for key bounce
+#define refreshDelay	200 //Time to wait between refreshing screens
+>>>>>>> Stashed changes
 
 //Define usable screen space
 #define screenTextWidth		16 //Max characters you can print on one line
 #define screenTextHeight	3 //Max lines of text that can show on the controller
 
 //Array
+<<<<<<< Updated upstream
 #define maxMenus					3 //Make this the same # as items in maxMenusIndex
 #define maxOptions				3 //Make this the same # as items in 2D of menuDisplayIndex
 
@@ -56,6 +66,16 @@ I, robonxt, has provided a basic templete, but you'll need to modify the code to
 #define modeDriver				1
 #define modeAuton					2
 #define modeError					3
+=======
+#define maxMenus			3 //Make this the same # as items in maxMenusIndex
+#define maxOptions		3 //Make this the same # as items in 2D of menuDisplayIndex
+
+//Robot status
+#define modeDisabled	0
+#define modeDriver		1
+#define modeAuton		2
+#define modeError		3
+>>>>>>> Stashed changes
 
 /*------------------------------------------------------------------------------------------------------
 [GLOBAL] Arrays for GUI > GUI needed stuff
@@ -74,7 +94,11 @@ int maxMenusIndex[maxMenus] =
 {
 	2,
 	2,
+<<<<<<< Updated upstream
  	2
+=======
+	2
+>>>>>>> Stashed changes
 };
 
 //1D Array for selected options
@@ -170,12 +194,21 @@ int keyPressed()
 int currStatus()
 {
 	int status;
+<<<<<<< Updated upstream
 	if (eneble == true) //If robot is enabled, check what mode/period the match is in
 	{
 		if (win == true) {
 			status = modeAuton; //Robot is in Autonomous mode
 		}
 		else if (win == false) {
+=======
+	if (Win.isEnabled()) //If robot is enabled, check what mode/period the match is in
+	{
+		if (Win.isAutonomous()) {
+			status = modeAuton; //Robot is in Autonomous mode
+		}
+		else if (Win.isDriverControl()) {
+>>>>>>> Stashed changes
 			status = modeDriver; //Robot is in Driver Control mode
 		}
 		else
@@ -218,9 +251,15 @@ void GUI_print(std::string text, int row, int col) //pass text, row, and col
 {
 	//NOTE: Does not call GUI_clearScreen for you, only clears current line
 	GUI_clearLine(row);
+<<<<<<< Updated upstream
 	Controller1.set_text(row + 1, col + 2, text.c_str());
 	//Controller1.Screen.setCursor(row + 1, col + 2); //Col + 2: Prevent overwrite of selector GUI
 	//Controller1.Screen.print(text.c_str()); //Future GUI will scroll text
+=======
+	controller_print(CONTROLLER_MASTER, row+1, col+2);
+	Controller1.Screen.setCursor(row + 1, col + 2); //Col + 2: Prevent overwrite of selector GUI
+	Controller1.Screen.print(text.c_str()); //Future GUI will scroll text
+>>>>>>> Stashed changes
 }
 
 /*------------------------------------------------------------------------------------------------------
@@ -230,16 +269,26 @@ void GUI_selector(int row) //pass which row you want the selector to be
 {
 	for (int i = 1; i <= screenTextHeight; i++) //clears just the selector GUI
 	{
+<<<<<<< Updated upstream
 		Controller1.set_text(i, 1, "|");
 		//Controller.Screen.setCursor(i, 1);
 		//Controller.Screen.print("|");
+=======
+		Controller.Screen.setCursor(i, 1);
+		Controller.Screen.print("|");
+>>>>>>> Stashed changes
 	}
 
 	//reminder of row == row mod / 3
 	int showCursor = (row % screenTextHeight) + 1;
+<<<<<<< Updated upstream
 	Controller1.set_text(showCursor, 1, ">");
 	//Controller.Screen.setCursor(showCursor, 1);
 	//Controller.Screen.print(">");
+=======
+	Controller.Screen.setCursor(showCursor, 1);
+	Controller.Screen.print(">");
+>>>>>>> Stashed changes
 }
 
 /*------------------------------------------------------------------------------------------------------
@@ -274,10 +323,15 @@ void GUI_status(int mode) //pass 0 (Disabled), 1 (Auton), or 2 (????)
 void GUI_printMSG(std::string str)
 {
 	//Clears screen then print GUI
+<<<<<<< Updated upstream
 	Controller1.set_text(1, 1,"");
 	//Controller.Screen.setCursor(1, 1);
 	//Controller.Screen.clearScreen();
 	Controller1.clear();
+=======
+	Controller.Screen.setCursor(1, 1);
+	Controller.Screen.clearScreen();
+>>>>>>> Stashed changes
 	GUI_status(currStatus());
 
 	GUI_print(str, 0, 0);
@@ -413,6 +467,7 @@ void autonomous(void)
 	//If configuration[0] is 0 (BLUE) or 1 (RED), display color on Brain
 	if (configuration[0] == 0) //If Blue
 	{
+<<<<<<< Updated upstream
 		lv_color16_t(blue);
 		//Brain.Screen.clearScreen(vex::color::blue);
 	}
@@ -420,6 +475,13 @@ void autonomous(void)
 	{
 		lv_color16_t(red);
 		//Brain.Screen.clearScreen(vex::color::red);
+=======
+		Brain.Screen.clearScreen(vex::color::blue);
+	}
+	else if (configuration[0] == 1) //If Red
+	{
+		Brain.Screen.clearScreen(vex::color::red);
+>>>>>>> Stashed changes
 	}
 
 	//If configuration[1] is 0 (Front row) or 1 (Back row), run correct auton
@@ -445,9 +507,13 @@ void usercontrol(void)
 	//User control code here, inside the loop
 	while (1)
 	{
+<<<<<<< Updated upstream
 		Controller1.clear();
 		lv_color16_t(green);
 		//___int16_t_definedBrain.Screen.clearScreen(vex::color::green); //Get the driver control ready with visual cues
+=======
+		Brain.Screen.clearScreen(vex::color::green); //Get the driver control ready with visual cues
+>>>>>>> Stashed changes
 
 		//If configuration[2] is 0 (RC) or 1 (TANK), run correct mode
 		while (configuration[2] == 0)
@@ -473,9 +539,15 @@ int main()
 	pre_auton();
 
 	//Set up callbacks for autonomous and driver control periods.
+<<<<<<< Updated upstream
 	/*Win.autonomous(autonomous);									 // muista
 	Win.drivercontrol(usercontrol);               // laita main.cpp callback!!!!
 */
+=======
+	Win.autonomous(autonomous);
+	Win.drivercontrol(usercontrol);
+
+>>>>>>> Stashed changes
 	//Prevent main from exiting with an infinite loop.
 	while (1)
 	{

@@ -1,4 +1,3 @@
-#include "main.h"
 #include "voidit.h"
 
 
@@ -118,8 +117,8 @@ stop();
 		koordinaattiX = x;
 		koordinaattiY = y;
 	//}
-	/*else {
-		koordinaattiX += xNyt;
-		koordinaattiY += yNyt;
-	}*/
+//	else {
+	//	koordinaattiX += xNyt;
+	//	koordinaattiY += yNyt;
+	//}
 }
