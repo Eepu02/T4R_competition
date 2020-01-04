@@ -1,6 +1,6 @@
-#include "main.h"
 #include "config.h"
-#include "pros/api_legacy.h"
+#include "main.h"
+
 
 int speed;
 int defaultTraySpeed = 127;
@@ -45,35 +45,6 @@ void printSensorValues() {
 double avarage (float x, float y) {
   return (x + y) / 2;
  }
-
-
-/*void displayDriveMotorSpeeds (int C)
-{
- switch(C)
- {
-   case 0:
-     printf("vasenE %f\n", EtuVasen.getPosition());
-   break;
-
-   case 1:
-     printf("vasenT %f\n", TakaVasen.getPosition());
-   break;
-
-   case 2:
-    printf("OikeaE %fn", EtuOikea.getPosition());
-   break;
-
-   case 3:
-    printf("OikeaT %f", TakaOikea.getPosition());
-   break;
-
-   default:
-    printf(10, 20, "vasenE %f", EtuVasen.getPosition());
-    printf(10, 60, "vasenT %f", TakaVasen.getPosition());
-    printf(10, 100, "OikeaE %f", EtuOikea.getPosition());
-    printf(10, 140, "OikeaT %f", TakaOikea.getPosition());
- }
-}*/
 
 // sets speed for right side drive
 void setRightSpeed(int speed)
@@ -365,11 +336,6 @@ void turn (bool slow, float degree, int speed) {
 }
 
 
-//void my_task_fn(void* param) {
-     //std::cout << Hello << (char*)param << std::endl;
-     // ...
- //}
-
 void G () {
 track();
  while (1) {
@@ -414,6 +380,10 @@ void PID(float target) {
   }
 }
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 void arcadeDrive() {
     int Y1, X1;          // Vertical, Horizontal Joystick Values
@@ -442,6 +412,14 @@ void arcadeDrive() {
 
 }
 
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 
 void forward(float etaisyys, int angle, int speed, bool stopMotors = true, float speedScale = 0.97)
 {
@@ -528,83 +506,5 @@ void backward(float etaisyys, int angle, int speed, bool stopMotors = true, floa
     sleep(30);
 
   }while (etaisyys >= fabs(kuljettumatka));
-  stop();
-}
-
-
-void forward(float etaisyys, int angle, int speed, float speedScale = 0.97) {
-
-    double gyroValue;
-    float kuljettumatka;
-    double error;
-    resetEncoders();
-
-    do {
-      getEncoderValues();
-      gyroValue = suunta;
-      error = angle - gyroValue;
-      kuljettumatka = avarage(getDistance(er), getDistance(el));
-
-      moveForward(speed);
-
-      if (error > 0)
-      {
-          setLeftSpeed(speed);
-          setRightSpeed(speed * speedScale);
-      }
-      else if (error < 0)
-      {
-          setLeftSpeed(speed * speedScale);
-          setRightSpeed(speed);
-       }
-    else moveForward(speed);
-
-     double matkaaJaljella = etaisyys - kuljettumatka;
-
-     if(matkaaJaljella < 360 * 2) speed = matkaaJaljella * 0.1388;
-     if(speed > 100) speed = 100;
-     else if(speed < 2) speed = 2;
-
-     sleep(30);
-
-  }while (etaisyys >= kuljettumatka);
-  stop();
-}
-// drives straight backward using cm
-void backward(float etaisyys, int angle, int speed, bool stopMotors = true, float speedScale = 0.97)
-{
-    double gyroValue;
-    double error;
-    float kuljettumatka;
-
-    resetEncoders();
-    do {
-        gyroValue = suunta;
-        kuljettumatka = avarage(getDistance(er), getDistance(el));
-        error = angle - gyroValue;
-
-    movedBackward(speed);
-
-    if (error > 0)
-    {
-        setLeftSpeed(-speed);
-        setRightSpeed(-speed * speedScale);
-    }
-    else if (error < 0)
-    {
-        setLeftSpeed(-speed * speedScale);
-        setRightSpeed(-speed);
-    }
-    else movedBackward(speed);
-
-    double matkaaJaljella = etaisyys - kuljettumatka;
-
-     if(matkaaJaljella < 360 * 2) speed = matkaaJaljella * 0.1388;
-     if(speed > 100) speed = 100;
-     else if(speed < 2) speed = 2;
-
-    sleep(30);
-
-  }while (etaisyys >= kuljettumatka);
   stop();
 }
