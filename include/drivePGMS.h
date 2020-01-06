@@ -70,42 +70,41 @@ void tankD()  {
 
     //kauhan varsien liike
     //movement of collector liftx
-    Nostin.set_encoder_units(MOTOR_ENCODER_DEGREES);
 
-    if (firConLift && C1.get_digital(DIGITAL_L1) && Nostin.get_encoder_units() < 3000) nostinLiike(1);
-    else if (secConLift && C2.get_digital(DIGITAL_L1)) nostinLiike(1);
+    if (firConLift && C1.get_digital(DIGITAL_L1) && Nostin.get_encoder_units() < 3000) raiseLift();
+    else if (secConLift && C2.get_digital(DIGITAL_L1)) raiseLift();
 
-    else if (firConLift && C1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2);
+    else if (firConLift && C1.get_digital(DIGITAL_L2) && !Bumper.get_value()) lowerLift();
     else if (secConLift && C2.get_digital(DIGITAL_L2) &&
-             !Bumper.get_value()) nostinLiike(2);
+             !Bumper.get_value()) lowerLift();
 
     else if (firConLift && C1.get_digital(DIGITAL_UP) && // kun RN liikkuu ylös nostin nousee myös
              PotRN.get_value() > 1840 && Bumper.get_value()) {
-                if(PotRN.get_value() < 1900) nostinLiike(1);
+                if(PotRN.get_value() < 1900) raiseLift();
     }
     else if (secConLift && PotRN.get_value() > 1840 && Bumper.get_value()) {
-                if(PotRN.get_value() < 1900) nostinLiike(1);
+                if(PotRN.get_value() < 1900) raiseLift();
     }
-    else nostinLiike(3);
+    else stopLift();
 
 
     // kerääjän liike
     // collector movement
 
 
-    if (firConCollector && C1.get_digital(DIGITAL_R1)) keraajaLiike(1);
-    else if (secConCollector &&  C2.get_digital(DIGITAL_R1)) keraajaLiike(1);
+    if (firConCollector && C1.get_digital(DIGITAL_R1)) startIntake();
+    else if (secConCollector &&  C2.get_digital(DIGITAL_R1)) startIntake();
 
-    else if (firConCollector && C1.get_digital(DIGITAL_R2)) keraajaLiike(2);
-    else if (secConCollector && C2.get_digital(DIGITAL_R2)) keraajaLiike(2);
+    else if (firConCollector && C1.get_digital(DIGITAL_R2)) reverseIntake();
+    else if (secConCollector && C2.get_digital(DIGITAL_R2)) reverseIntake();
 
-    else if (firConCollector && (PotRN.get_value() > 3200 && C1.get_digital(DIGITAL_R2))) keraajaLiike(2, 40);
-    else if (secConCollector && (PotRN.get_value() > 3200 && C2.get_digital(DIGITAL_R2))) keraajaLiike(2, 40);
+    else if (firConCollector && (PotRN.get_value() > 3200 && C1.get_digital(DIGITAL_R2))) reverseIntake(40);
+    else if (secConCollector && (PotRN.get_value() > 3200 && C2.get_digital(DIGITAL_R2))) reverseIntake(40);
 
     // else if (firConCollector && C1.get_digital(DIGITAL_A)) keraajaLiike(2, 40);
     // else if (secConCollector && C2.get_digital(DIGITAL_A)) keraajaLiike(2, 40);
 
-    else keraajaLiike(3);
+    else stopIntake();
 
 
     // rampin nostimen liike
@@ -113,13 +112,13 @@ void tankD()  {
     if(PotRN.get_value() > hidVal)  rnSpeed = CoS();
     else rnSpeed = 127;
 
-    if(firConRN && C1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) RN(1, rnSpeed);
-    else if(secConRN && C2.get_digital(DIGITAL_UP) && PotRN.get_value() < maxVal) RN(1, rnSpeed);
+    if(firConRN && C1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
+    else if(secConRN && C2.get_digital(DIGITAL_UP) && PotRN.get_value() < maxVal) raiseTray(rnSpeed);
 
-    else if(firConRN && C1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) RN(2, 127);
-    else if(secConRN && C2.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) RN(2, 127);
+    else if(firConRN && C1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
+    else if(secConRN && C2.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
 
-    else RN(3);
+    else stopTray();
 
     sleep(20);
 
@@ -170,37 +169,37 @@ void arcadeDrive() {
       //movement of collector liftx
       Nostin.set_encoder_units(MOTOR_ENCODER_DEGREES);
 
-      if (firConLift && C1.get_digital(DIGITAL_L1) && Nostin.get_encoder_units() < 3000) nostinLiike(1);
-      else if (secConLift && C2.get_digital(DIGITAL_L1)) nostinLiike(1);
+      if (firConLift && C1.get_digital(DIGITAL_L1) && Nostin.get_encoder_units() < 3000) raiseLift();
+      else if (secConLift && C2.get_digital(DIGITAL_L1)) lowerLift();
 
-      else if (firConLift && C1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2);
+      else if (firConLift && C1.get_digital(DIGITAL_L2) && !Bumper.get_value()) lowerLift();
       else if (secConLift && C2.get_digital(DIGITAL_L2) &&
-               !Bumper.get_value()) nostinLiike(2);
+               !Bumper.get_value()) lowerLift();
 
       else if (firConLift && C1.get_digital(DIGITAL_UP) && // kun RN liikkuu ylös nostin nousee myös
                PotRN.get_value() > 1840 && Bumper.get_value()) {
-                  if(PotRN.get_value() < 1900) nostinLiike(1);
+                  if(PotRN.get_value() < 1900) raiseLift();
       }
       else if (secConLift && PotRN.get_value() > 1840 && Bumper.get_value()) {
-                  if(PotRN.get_value() < 1900) nostinLiike(1);
+                  if(PotRN.get_value() < 1900) raiseLift();
       }
-      else nostinLiike(3);
+      else stopLift();
 
 
       // kerääjän liike
       // collector movement
 
 
-      if (firConCollector && C1.get_digital(DIGITAL_R1)) keraajaLiike(1);
-      else if (secConCollector &&  C2.get_digital(DIGITAL_R1)) keraajaLiike(1);
+      if (firConCollector && C1.get_digital(DIGITAL_R1)) startIntake();
+      else if (secConCollector &&  C2.get_digital(DIGITAL_R1)) startIntake();
 
-      else if (firConCollector && C1.get_digital(DIGITAL_R2)) keraajaLiike(2);
-      else if (secConCollector && C2.get_digital(DIGITAL_R2)) keraajaLiike(2);
+      else if (firConCollector && C1.get_digital(DIGITAL_R2)) reverseIntake();
+      else if (secConCollector && C2.get_digital(DIGITAL_R2)) reverseIntake();
 
-      else if (firConCollector && C1.get_digital(DIGITAL_A)) keraajaLiike(2, 10);
-      else if (secConCollector && C1.get_digital(DIGITAL_A)) keraajaLiike(2, 10);
+      else if (firConCollector && C1.get_digital(DIGITAL_A)) reverseIntake(10);
+      else if (secConCollector && C1.get_digital(DIGITAL_A)) reverseIntake(10);
 
-      else keraajaLiike(3);
+      else stopIntake();
 
 
       // rampin nostimen liike
@@ -208,13 +207,13 @@ void arcadeDrive() {
       if(PotRN.get_value() > hidVal)  rnSpeed = CoS();
       else rnSpeed = 127;
 
-      if(firConRN && C1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) RN(1, rnSpeed);
-      else if(secConRN && C2.get_digital(DIGITAL_UP) && PotRN.get_value() < maxVal) RN(1, rnSpeed);
+      if(firConRN && C1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
+      else if(secConRN && C2.get_digital(DIGITAL_UP) && PotRN.get_value() < maxVal) raiseTray(rnSpeed);
 
-      else if(firConRN && C1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) RN(2, 127);
-      else if(secConRN && C2.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) RN(2, 127);
+      else if(firConRN && C1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
+      else if(secConRN && C2.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
 
-      else RN(3);
+      else stopTray();
 
 
   sleep(20);
