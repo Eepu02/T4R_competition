@@ -160,7 +160,7 @@ void RN (int suunta, int speed = defaultTraySpeed) {
 // Values from CAD model
 const float dr = 6.3202;
 const float dl = 7.62301;
-const float db = -3.125 + 1.25;
+const float db = -3.125;
 
 // Tracking variables
 double er         = 0;
