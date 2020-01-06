@@ -2,7 +2,7 @@
 #include "main.h"
 
 
-int speed;
+
 int defaultTraySpeed = 127;
 int defaultLiftSpeed = 127;
 int defaultCollectorSpeed = 127;
@@ -104,19 +104,19 @@ void nostinLiike (int YA, int speed = defaultLiftSpeed)
 {
   switch (YA)
   {
-   case 1: Nostin.move(speed); break;
+   case 1: Nostin.move(speed);  break;
    case 2: Nostin.move(-speed); break;
-   case 3: Nostin.move(0); break;
+   case 3: Nostin.move(0);      break;
   }
 }
 
 // function to control cube collector movement
 void keraajaLiike (int suunta, int speed = defaultCollectorSpeed) {
   switch(suunta) {
-    case 1:   KerainOikea.move(speed); KerainVasen.move(speed); break;
+    case 1:   KerainOikea.move(speed); KerainVasen.move(speed);     break;
     case 2:   KerainOikea.move(-speed);  KerainVasen.move(-speed);  break;
-    case 3:   KerainOikea.move(0);      KerainVasen.move(0);      break;
-    default:  printf("Error selecting case for keraajaLiike\n");  break;
+    case 3:   KerainOikea.move(0);      KerainVasen.move(0);        break;
+    default:  printf("Error selecting case for keraajaLiike\n");    break;
   }
 }
 
@@ -172,15 +172,15 @@ void resetEncoders() {
 
 // Updates current and previous encoder values
 void getEncoderValues() {
-  er = encoderRight.get_value();
-  el = encoderLeft.get_value();
-  eb = encoderBack.get_value();
-  DEr = er - lastEr;
-  DEl = el - lastEl;
-  DEb = eb - lastEb;
-  lastEr = er;
-  lastEl = el;
-  lastEb = eb;
+  er         = encoderRight.get_value();
+  el         = encoderLeft.get_value();
+  eb         = encoderBack.get_value();
+  DEr        = er - lastEr;
+  DEl        = el - lastEl;
+  DEb        = eb - lastEb;
+  lastEr     = er;
+  lastEl     = el;
+  lastEb     = eb;
 }
 
 double getDistance(double degrees, float d = 3.25) {
@@ -202,7 +202,7 @@ void track() {
  resetEncoders();
  double  globalX = 0;
  double  globalY = 0;
- double radius = 0;
+ double  radius  = 0;
  while (1) {
    /*------------------------------------------------------*/
    /*                                                      */
@@ -349,10 +349,10 @@ void PID(float target) {
   float ki = 0.0;
   float kd = 0.0;
 
-  float currentVal = 0.0;
+  float currentVal  = 0.0;
+  float totalError  = 0.0;
+  float speed       = 0.0;
   float lastError;
-  float totalError = 0.0;
-  float speed = 0.0;
 
   while(1) {
     // Get latest values
@@ -379,27 +379,30 @@ void PID(float target) {
 
   }
 }
+double gyroValue;
+//double error;
+float kuljettumatka;
+float NytEtaisyys;
+float uusiArvo;
 
-void forward(float etaisyys, int angle, int speed, bool stopMotors = true, float speedScale = 0.97)
+void forward(float etaisyys, int angle, int speed, float speedScale = 0.97)
 {
-    double gyroValue;
-    double error;
-    float kuljettumatka;
+
     resetEncoders();
+    sleep(100);
+    getEncoderValues();
+    float alkuarvo = avarage(getDistance(el), getDistance(er));;
+    printf("alkuarvo: %f\n", NytEtaisyys);
 
     do {
       getEncoderValues();
 
-      float NytEtaisyys = getDistance(el, er);
-      gyroValue = suunta;
-      error = angle - gyroValue;
-      float kuljettumatka = (etaisyys - NytEtaisyys);
-    /*  Brain.Screen.printAt(45, 45, "Virhe: %f", error);
-      Brain.Screen.printAt(45, 135, "Gyro: %f", gyroValue);
-      Brain.Screen.printAt(45, 180, "kuljettumatka: %f", kuljettumatka);*/
-      sleep(300);
-
-      moveForward(speed);
+      NytEtaisyys = avarage(getDistance(el), getDistance(er));
+       gyroValue = suunta;
+       error = angle - gyroValue;
+       if (NytEtaisyys < etaisyys) sleep(10);
+       else if (NytEtaisyys > etaisyys) NytEtaisyys = NytEtaisyys - alkuarvo;
+        moveForward(speed);
 
       if (error > 0)
       {
@@ -413,36 +416,39 @@ void forward(float etaisyys, int angle, int speed, bool stopMotors = true, float
        }
     else moveForward(speed);
 
-     double matkaaJaljella = etaisyys - fabs(kuljettumatka);
+     double matkaaJaljella = etaisyys - NytEtaisyys;
 
-     if(matkaaJaljella < 360 * 2) speed = matkaaJaljella * 0.1388;
-     if(speed > 100) speed = 100;
-     else if(speed < 2) speed = 2;
+     if (matkaaJaljella < 5) {
+       if (matkaaJaljella * 10 < speed) speed = matkaaJaljella * 10;
+     }
 
      sleep(30);
 
+     printf("NytEtaisyys: %f\n", NytEtaisyys);
+     printf("uusiArvo: %f\n", uusiArvo);
 
-  }while (etaisyys >= fabs(kuljettumatka));
+  }while (etaisyys >= NytEtaisyys);
   stop();
 }
 // drives straight backward using cm
-void backward(float etaisyys, int angle, int speed, bool stopMotors = true, float speedScale = 0.97)
-{
-    double gyroValue;
-    double error;
-    float kuljettumatka;
-    resetEncoders();
-    do {
-        float NytEtaisyys = getDistance(el, er);
-        gyroValue = suunta;
-        error = angle - gyroValue;
-        float kuljettumatka = (etaisyys - NytEtaisyys);
-        /*Brain.Screen.printAt(45, 45, "Virhe: %f", error);
-        Brain.Screen.printAt(45, 135, "Gyro: %f", gyroValue);
-        Brain.Screen.printAt(45, 180, "kuljettumatka: %f", kuljettumatka);*/
-        sleep(300);
 
-    movedBackward(speed);
+void backward(float etaisyys, int angle, int speed, float speedScale = 0.97)
+{
+  resetEncoders();
+  sleep(100);
+  getEncoderValues();
+  float alkuarvo = avarage(getDistance(el), getDistance(er));;
+  printf("alkuarvo: %f\n", NytEtaisyys);
+
+  do {
+    getEncoderValues();
+
+    NytEtaisyys = avarage(getDistance(el), getDistance(er));
+     gyroValue = suunta;
+     error = angle - gyroValue;
+     if (NytEtaisyys < etaisyys) sleep(10);
+     else if (NytEtaisyys > etaisyys) NytEtaisyys = NytEtaisyys - alkuarvo;
+      movedBackward(-speed);
 
     if (error > 0)
     {
@@ -453,17 +459,20 @@ void backward(float etaisyys, int angle, int speed, bool stopMotors = true, floa
     {
         setLeftSpeed(-speed * speedScale);
         setRightSpeed(-speed);
-    }
-    else movedBackward(speed);
+     }
+  else movedBackward(-speed);
 
-     double matkaaJaljella = etaisyys - fabs(kuljettumatka);
+   double matkaaJaljella = etaisyys - NytEtaisyys;
 
-     if(matkaaJaljella < 360 * 2) speed = matkaaJaljella * 0.1388;
-     if(speed > 100) speed = 100;
-     else if(speed < 2) speed = 2;
+   if (matkaaJaljella < 5) {
+     if (matkaaJaljella * -10 < speed) speed = matkaaJaljella * -10;
+   }
 
-    sleep(30);
+   sleep(30);
 
-  }while (etaisyys >= fabs(kuljettumatka));
-  stop();
+   printf("NytEtaisyys: %f\n", NytEtaisyys);
+   printf("uusiArvo: %f\n", uusiArvo);
+
+}while (etaisyys >= NytEtaisyys);
+stop();
 }

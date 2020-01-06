@@ -3,7 +3,7 @@
 pros::Controller C1(pros::E_CONTROLLER_MASTER);
 pros::Controller C2(pros::E_CONTROLLER_PARTNER);
 pros::Motor TakaVasen(1);
-pros::Motor KerainVasen(6, MOTOR_GEARSET_18, true);
+pros::Motor KerainVasen(2, MOTOR_GEARSET_18, true);
 pros::Motor EtuVasen(5);
 pros::Motor TakaOikea(20, true);
 pros::Motor KerainOikea(7, MOTOR_GEARSET_18, false);
