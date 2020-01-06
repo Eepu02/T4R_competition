@@ -1,19 +1,17 @@
-#include "main.h"
-//#include "config.h"
-#include "voidit.h"
-#include "eitoimi500.h"
-
+#include "drivePGMS.h"
+//#include "icd.h"
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+
 void initialize() {
 	//pros::lcd::initialize();
 	//pros::lcd::print(0, "%d\n", encoderBack.get_value());
 	setup();
-	printf("hi");
+	eneble = true;
 }
 
 /**
@@ -21,7 +19,9 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled() {
+	eneble = true;
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field
@@ -32,7 +32,10 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+	win = true;
+	eneble = false;
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -45,10 +48,12 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {
 
-//liikuPisteeseen(200, 100, 50);
+void autonomous() {
+win = false;
+eneble = false;
 }
+
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -64,68 +69,14 @@ void autonomous() {
  */
 void opcontrol() {
 
-  int speed = 80;
-	int Nspeed = 100;
-  bool slowM = false;
-  resetDriveMotors();
-  //float NK = 0.8;
-	// track();
+//resetEncoders();
 
-  while(1) {
+		backward(20, 0, 80);
+do RN(1); while(PotRN.get_value() < 1060);
 
-   //vex::thread koordinaatit(G);
-   //displayDriveMotorSpeeds(4);
-
-	 // main driving code
-   if (abs(Controller1.get_analog(ANALOG_RIGHT_Y)) > 5 ||
-	 		 abs(Controller1.get_analog(ANALOG_LEFT_Y)) > 5) {
-     setRightSpeed(Controller1.get_analog(ANALOG_RIGHT_Y));
-     setLeftSpeed(Controller1.get_analog(ANALOG_LEFT_Y));
-   }
-/*
-	 else if (Controller1.get_analog(ANALOG_LEFT_X) > 5 ){
-     moveRight(abs(Controller1.get_analog(ANALOG_LEFT_X)));
-	 }
-	 else if (Controller1.get_analog(ANALOG_LEFT_X) < 5 ){
-     moveLeft(abs(Controller1.get_analog(ANALOG_LEFT_X)));
-	 }
-	 */
-	 else if(Controller1.get_digital(DIGITAL_RIGHT)) moveRight(speed);
-   else if(Controller1.get_digital(DIGITAL_LEFT)) moveLeft(speed);
-   else stop();
-
-    //kauhan varsien liike
-		//movement of collector lift
-
-    if (Controller1.get_digital(DIGITAL_L1)) nostinLiike(1);
-    else if (Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) nostinLiike(2);
-		else if (Controller1.get_digital(DIGITAL_UP) &&
-		 					PotRN.get_value() > 1500 && Bumper.get_value()) {
-			if(PotRN.get_value() < 1800) nostinLiike(1);
-		}
-    else nostinLiike(3);
-
-
-
-    // kerääjän liike
-		// collector movement
-    if (Controller1.get_digital(DIGITAL_R1)) keraajaLiike(1);
-    else if (Controller1.get_digital(DIGITAL_R2)) keraajaLiike(2);
-    else keraajaLiike(3);
-
-
-    // rampin nostimen liike
-		// cube tray movement
-		if (PotRN.get_value() > 2800 &&  Controller1.get_digital(DIGITAL_UP)) Nspeed = Nspeed - 0.2;
-		else Nspeed = 100;
-    if (Controller1.get_digital(DIGITAL_UP) && PotRN.get_value() < 4095 ) RN(1, Nspeed);
-    else if (Controller1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > 1550) RN(2, Nspeed);
-    else RN(3);
-
-		//printSensorValues();
-
-   	sleep(20);
-
-		//toinen ohjain, jos käytämme
- }
+	while(1)	{
+	 int potVal = PotRN.get_value();
+	 	printf("nostin: %d\n", Nostin.get_encoder_units());
+ 		tankD();
+	}
 }
