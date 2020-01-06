@@ -69,5 +69,14 @@ eneble = false;
  */
 void opcontrol() {
 
-arcadeDrive();
+//resetEncoders();
+
+		backward(20, 0, 80);
+do RN(1); while(PotRN.get_value() < 1060);
+
+	while(1)	{
+	 int potVal = PotRN.get_value();
+	 	printf("nostin: %d\n", Nostin.get_encoder_units());
+ 		tankD();
+	}
 }
