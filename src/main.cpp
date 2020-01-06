@@ -67,16 +67,30 @@ eneble = false;
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+
+//  void my_task_fn(void* param) {
+//   while(1) {
+// 		printf("hi\n");
+// 		sleep(100);
+// 	}
+//   // ...
+// }
+
 void opcontrol() {
 
-//resetEncoders();
+	//resetEncoders();
 
-		backward(20, 0, 80);
-do RN(1); while(PotRN.get_value() < 1060);
+	// Create tracking task with a priority of 10 (default 8);
+	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
+								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
+	//autoUnfold();
 
+	pros::Task my_cpp_task (track_task);
+	turn(true, 90, 127);
+	//read();
 	while(1)	{
-	 int potVal = PotRN.get_value();
-	 	printf("nostin: %d\n", Nostin.get_encoder_units());
+	 	// int potVal = PotRN.get_value();
+	 	// printf("nostin: %d\n", Nostin.get_encoder_units());
  		tankD();
 	}
 }

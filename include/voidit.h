@@ -2,12 +2,15 @@
 #include "main.h"
 
 
-
+// Define default speeds for various robot mechanisms
 int defaultTraySpeed = 127;
 int defaultLiftSpeed = 127;
 int defaultCollectorSpeed = 127;
+
 bool win;
 bool eneble;
+
+pros::Mutex mutex;
 
 // simple sleep function
 void sleep (int x)
@@ -15,13 +18,22 @@ void sleep (int x)
   pros::delay(x);
 }
 
-// resets all drive motor internal encoders
+// Resets all tracking wheels
+void resetEncoders() {
+  encoderBack.reset();
+  encoderLeft.reset();
+  encoderRight.reset();
+}
+
+// Resets all drive motor internal encoders
 void resetDriveMotors ()
 {
   EtuOikea.tare_position();
   TakaOikea.tare_position();
   EtuVasen.tare_position();
   TakaVasen.tare_position();
+  Nostin.tare_position();
+  Nostin.set_encoder_units(MOTOR_ENCODER_DEGREES);
 }
 
 void setup() {
@@ -29,6 +41,8 @@ void setup() {
    KerainOikea.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
    Nostin.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
    RampinNostin.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+   resetDriveMotors();
+   resetEncoders();
 
 }
 
@@ -42,7 +56,7 @@ void printSensorValues() {
   pros::delay(100);
 }
 
-double avarage (float x, float y) {
+double average (float x, float y) {
   return (x + y) / 2;
  }
 
@@ -94,13 +108,23 @@ void moveLeft(int speed) {
   setNorthEastSpeed(speed);
 }
 
+void turnRight(int speed) {
+  setLeftSpeed(speed);
+  setRightSpeed(-speed);
+}
+
+void turnLeft(int speed) {
+  setLeftSpeed(-speed);
+  setRightSpeed(speed);
+}
+
 void stop() {
   setRightSpeed(0);
   setLeftSpeed(0);
 }
 
 // function to control cube collector movement
-void nostinLiike (int YA, int speed = defaultLiftSpeed)
+void moveLift (int YA, int speed = defaultLiftSpeed)
 {
   switch (YA)
   {
@@ -110,24 +134,87 @@ void nostinLiike (int YA, int speed = defaultLiftSpeed)
   }
 }
 
+void raiseLift(int speed = defaultLiftSpeed) {
+  moveLift(1, speed);
+}
+
+void lowerLift(int speed = defaultLiftSpeed) {
+  moveLift(2, speed);
+}
+
+void stopLift() {
+  moveLift(3);
+}
+
 // function to control cube collector movement
-void keraajaLiike (int suunta, int speed = defaultCollectorSpeed) {
-  switch(suunta) {
-    case 1:   KerainOikea.move(speed); KerainVasen.move(speed);     break;
-    case 2:   KerainOikea.move(-speed);  KerainVasen.move(-speed);  break;
-    case 3:   KerainOikea.move(0);      KerainVasen.move(0);        break;
-    default:  printf("Error selecting case for keraajaLiike\n");    break;
+void moveIntake (int heading, int speed = defaultCollectorSpeed) {
+  switch(heading) {
+    case 1:   KerainOikea.move(speed);  KerainVasen.move(speed);   break;
+    case 2:   KerainOikea.move(-speed); KerainVasen.move(-speed);  break;
+    case 3:   KerainOikea.move(0);      KerainVasen.move(0);       break;
+    default:  printf("Error selecting case for moveIntake\n");     break;
   }
 }
 
+void startIntake(int speed = defaultCollectorSpeed) {
+  moveIntake(1, speed);
+}
+
+void reverseIntake(int speed = defaultCollectorSpeed) {
+  moveIntake(2, speed);
+}
+
+void stopIntake() {
+  moveIntake(3);
+}
+
 // function for controlling cube tray movement
-void RN (int suunta, int speed = defaultTraySpeed) {
-  switch (suunta) {
+void moveTray (int heading, int speed = defaultTraySpeed) {
+  switch (heading) {
     case 1:   RampinNostin.move(speed);                 break;
     case 2:   RampinNostin.move(-speed);                break;
     case 3:   RampinNostin.move(0);                     break;
     default:  printf("Error selecting case for RN\n");  break;
   }
+}
+
+void raiseTray(int speed = defaultTraySpeed) {
+  moveTray(1, speed);
+}
+
+void lowerTray(int speed = defaultTraySpeed) {
+  moveTray(2, speed);
+}
+
+void stopTray() {
+  moveTray(3);
+}
+
+/* Function to unfold the robot automatically on match start */
+void autoUnfold() {
+
+  // setup
+  Nostin.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+  RampinNostin.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+  Nostin.tare_position();
+  RampinNostin.tare_position();
+
+  // Fold out intakes
+  do {
+    raiseTray();
+  } while(PotRN.get_value() < 4095); //1060
+  RampinNostin.move_absolute(30, 127);
+
+  /*while(!C1.get_digital(DIGITAL_X)) sleep(20);
+  // Fold out tray
+  RampinNostin.move_absolute(0, 127);
+  raiseLift();
+  while(Nostin.get_position() < 1300) sleep(20);
+
+  // Reset lift
+  Nostin.move_absolute(0, 127);
+  sleep(5000);*/
+
 }
 
 // Tracking wheels' distance to tracking center
@@ -137,18 +224,19 @@ const float dl = 7.62301;
 const float db = -3.125;
 
 // Tracking variables
-double er         = 0;
-double el         = 0;
-double eb         = 0;
-double lastEr     = 0;
-double lastEl     = 0;
-double lastEb     = 0;
-double DEr        = er - lastEr;
-double DEl        = el - lastEl;
-double DEb        = eb - lastEb;
-double suunta     = 0.0;
-double dSuunta    = 0.0;
-double lastSuunta = 0.0;
+int er         = 0;
+int el         = 0;
+int eb         = 0;
+int lastEr     = 0;
+int lastEl     = 0;
+int lastEb     = 0;
+int DEr        = er - lastEr;
+int DEl        = el - lastEl;
+int DEb        = eb - lastEb;
+double heading      = 0.0;
+double* ptr = &heading;
+double deltaHeading = 0.0;
+double lastSuunta   = 0.0;
 
 double r = 0;
 
@@ -160,15 +248,9 @@ double yG = 0;
 double xL = 0;
 double yL = 0;
 
-double error;
+// double error;
 
 //float heading = 0.0;
-
-void resetEncoders() {
-  encoderBack.reset();
-  encoderLeft.reset();
-  encoderRight.reset();
-}
 
 // Updates current and previous encoder values
 void getEncoderValues() {
@@ -183,8 +265,8 @@ void getEncoderValues() {
   lastEb     = eb;
 }
 
-double getDistance(double degrees, float d = 3.25) {
-  return M_PI * d * (degrees / 360);
+double getDistance(int degrees, float d = 3.25) {
+  return M_PI * d * (double(degrees) / 360);
 }
 
 // Computes the change in orientation since last oriantation
@@ -197,9 +279,7 @@ double getHeading() {
 }
 
 /* Local axis is offset from global axis by getHeading() / 2!!!*/
-void track() {
- resetDriveMotors();
- resetEncoders();
+void track(void* param) {
  double  globalX = 0;
  double  globalY = 0;
  double  radius  = 0;
@@ -214,19 +294,23 @@ void track() {
    getEncoderValues();
 
    // Compute change in orientation
-   dSuunta = getHeading();
+   deltaHeading = getHeading();
 
    // The new orientation is the previous orientation plus the change
-   suunta += dSuunta;
+   mutex.take(5);
+   heading += deltaHeading;
 
-   printf("Kulma: %f\n", suunta * (180 / M_PI));
+   // printf("Kulma: %f\n", heading * (180 / M_PI));
+   mutex.give();
 
-   double gamma = M_PI - (M_PI/4) - (dSuunta/2);
+   // double theta = (-180*())
 
-   if(dSuunta == 0) radius = 0;
-   else radius = (getDistance(DEr) / dSuunta) + dr;
+   /*double gamma = M_PI - (M_PI/4) - (deltaHeading/2);
 
-   double line = 2* (sin(dSuunta/2)*radius);
+   if(deltaHeading == 0) radius = 0;
+   else radius = (getDistance(DEr) / deltaHeading) + dr;
+
+   double line = 2* (sin(deltaHeading/2)*radius);
 
    double currentX = line*cos(gamma);
    double currentY = line*sin(gamma);
@@ -239,7 +323,7 @@ void track() {
 
    //printf("X: %f\n", globalX);
    //printf("Y: %f\n", globalY);
-   //printf(20, 160, "Y: %f", globalY);
+   //printf(20, 160, "Y: %f", globalY);*/
    /*------------------------------------------------------*/
    /*                                                      */
    /*                  LOCAL COORDINATES                   */
@@ -247,7 +331,7 @@ void track() {
    /*------------------------------------------------------*/
 /*
    // Check if the orientation is the same as last cycle
-   if(lastSuunta == dSuunta) {
+   if(lastSuunta == deltaHeading) {
      // Left and right wheel have moved the same distance, so current oriantation is 0
      yL = getDistance(DEr);
 
@@ -278,16 +362,16 @@ void track() {
    /*------------------------------------------------------*/
 
    // If global orientation is zero
-   /*if(suunta == 0) {
+   /*if(heading == 0) {
      xG += xL;
      yG += yL;
    }
    else {
-     xG += xL * cos(dSuunta);
-     yG += yL * sin(dSuunta);
+     xG += xL * cos(deltaHeading);
+     yG += yL * sin(deltaHeading);
    }*/
 
-   lastSuunta = dSuunta;
+   // lastSuunta = deltaHeading;
 
    // Compute translation in local coordinates
    //xL = 2 * sin(getHeading() / 2) * (DEb / getHeading() + db);
@@ -297,52 +381,69 @@ void track() {
    //xG = xL * cos(getHeading() / 2) + yL * sin(getHeading() / 2);
    //yG = -xL * sin(getHeading() / 2) + yL * cos(getHeading() / 2);
 
+   // Runs in 5 second intervals
    sleep(5);
  }
 }
 
-void turn (bool slow, float degree, int speed) {
+double getDirection() {
+  // Gets latest encoder values
+  getEncoderValues();
+
+  // Compute change in orientation
+  deltaHeading = getHeading();
+
+  // The new orientation is the previous orientation plus the change
+  return heading += deltaHeading * (180 / M_PI);
+}
+
+// void read() {
+//   while(1) {
+//     printf("Heading toisessa paikassa: %f\n", *ptr);
+//     sleep(100);
+//   }
+// }
+
+void turn (bool slow, double targetHeading, int speed) {
   double raja = 0.2;
-  int minSpeed = 5;
-  error = (suunta - degree);
-  if (degree < error) {
+  int minSpeed = 30;
+  double error = heading * (180 / M_PI) - targetHeading;
+  if (targetHeading < error) {
     do {
-     error = (suunta - degree);
+    mutex.take(20);
+     error = heading * (180 / M_PI) - targetHeading;
+     mutex.give();
      if (slow) {
-       if(error < speed) speed = (fabs(error));
-       if(speed < minSpeed) speed = minSpeed;
+       if(fabs(error) < double(speed)) {
+         speed = round(fabs(error)) * 6;
+         if(speed < minSpeed) speed = minSpeed;
+       }
      }
-     setRightSpeed(speed);
-     setLeftSpeed(-speed);
+     turnLeft(speed);
+     sleep(20);
     }
-    while (error > raja);
-    setLeftSpeed(0);
-    setRightSpeed(0);
+    while (fabs(error) > raja);
+    stop();
   }
-  if (degree > error) {
+  if (targetHeading > error) {
     do {
-      error = (suunta - degree);
+      error = heading * (180 / M_PI) - targetHeading;
+      // printf("Error: %f\n", error);
       if (slow) {
-       if(error < speed) speed = (fabs(error));
-       if(speed < minSpeed) speed = minSpeed;
+        if(fabs(error) < double(speed)) {
+          speed = round(fabs(error));
+          if(speed < minSpeed) speed = minSpeed;
+        }
       }
-      setRightSpeed(-speed);
-      setLeftSpeed(speed);
+      printf("speed: %d\n", speed);
+      turnRight(speed);
+      sleep(20);
     }
-    while (error < raja);
-    setLeftSpeed(0);
-    setRightSpeed(0);
+    while (fabs(error) > raja);
+    stop();
+    printf("Error: %f\n", error);
   }
 }
-
-
-void G () {
-track();
- while (1) {
-   sleep(5);
-  }
-}
-
 
 void PID(float target) {
   float kp = 0.0;
@@ -356,7 +457,7 @@ void PID(float target) {
 
   while(1) {
     // Get latest values
-    currentVal = avarage(getDistance(encoderLeft.get_value()), getDistance(encoderRight.get_value()));
+    currentVal = average(getDistance(encoderLeft.get_value()), getDistance(encoderRight.get_value()));
 
     // Compute error for proportional term
     float error = target - currentVal;
@@ -382,26 +483,26 @@ void PID(float target) {
 double gyroValue;
 //double error;
 float kuljettumatka;
-float NytEtaisyys;
+float currentDistance;
 float uusiArvo;
 
-void forward(float etaisyys, int angle, int speed, float speedScale = 0.97)
+void forward(float targetDistance, int angle, int speed, float speedScale = 0.97)
 {
-
+    float error;
     resetEncoders();
     sleep(100);
     getEncoderValues();
-    float alkuarvo = avarage(getDistance(el), getDistance(er));;
-    printf("alkuarvo: %f\n", NytEtaisyys);
+    float alkuarvo = average(getDistance(el), getDistance(er));;
+    printf("alkuarvo: %f\n", currentDistance);
 
     do {
       getEncoderValues();
 
-      NytEtaisyys = avarage(getDistance(el), getDistance(er));
-       gyroValue = suunta;
+      currentDistance = average(getDistance(el), getDistance(er));
+       gyroValue = heading;
        error = angle - gyroValue;
-       if (NytEtaisyys < etaisyys) sleep(10);
-       else if (NytEtaisyys > etaisyys) NytEtaisyys = NytEtaisyys - alkuarvo;
+       if (currentDistance < targetDistance) sleep(10);
+       else if (currentDistance > targetDistance) currentDistance = currentDistance - alkuarvo;
         moveForward(speed);
 
       if (error > 0)
@@ -416,38 +517,39 @@ void forward(float etaisyys, int angle, int speed, float speedScale = 0.97)
        }
     else moveForward(speed);
 
-     double matkaaJaljella = etaisyys - NytEtaisyys;
+     double error = targetDistance - currentDistance;
 
-     if (matkaaJaljella < 5) {
-       if (matkaaJaljella * 10 < speed) speed = matkaaJaljella * 10;
+     if (error < 5) {
+       if (error * 10 < speed) speed = error * 10;
      }
 
      sleep(30);
 
-     printf("NytEtaisyys: %f\n", NytEtaisyys);
+     printf("currentDistance: %f\n", currentDistance);
      printf("uusiArvo: %f\n", uusiArvo);
 
-  }while (etaisyys >= NytEtaisyys);
+  }while (targetDistance >= currentDistance);
   stop();
 }
 // drives straight backward using cm
 
-void backward(float etaisyys, int angle, int speed, float speedScale = 0.97)
+void backward(float targetDistance, int angle, int speed, float speedScale = 0.97)
 {
+  float error;
   resetEncoders();
   sleep(100);
   getEncoderValues();
-  float alkuarvo = avarage(getDistance(el), getDistance(er));;
-  printf("alkuarvo: %f\n", NytEtaisyys);
+  float alkuarvo = average(getDistance(el), getDistance(er));;
+  printf("alkuarvo: %f\n", currentDistance);
 
   do {
     getEncoderValues();
 
-    NytEtaisyys = avarage(getDistance(el), getDistance(er));
-     gyroValue = suunta;
+    currentDistance = average(getDistance(el), getDistance(er));
+     gyroValue = heading;
      error = angle - gyroValue;
-     if (NytEtaisyys < etaisyys) sleep(10);
-     else if (NytEtaisyys > etaisyys) NytEtaisyys = NytEtaisyys - alkuarvo;
+     if (currentDistance < targetDistance) sleep(10);
+     else if (currentDistance > targetDistance) currentDistance = currentDistance - alkuarvo;
       movedBackward(-speed);
 
     if (error > 0)
@@ -462,17 +564,17 @@ void backward(float etaisyys, int angle, int speed, float speedScale = 0.97)
      }
   else movedBackward(-speed);
 
-   double matkaaJaljella = etaisyys - NytEtaisyys;
+   double error = targetDistance - currentDistance;
 
-   if (matkaaJaljella < 5) {
-     if (matkaaJaljella * -10 < speed) speed = matkaaJaljella * -10;
+   if (error < 5) {
+     if (error * -10 < speed) speed = error * -10;
    }
 
    sleep(30);
 
-   printf("NytEtaisyys: %f\n", NytEtaisyys);
+   printf("currentDistance: %f\n", currentDistance);
    printf("uusiArvo: %f\n", uusiArvo);
 
-}while (etaisyys >= NytEtaisyys);
+}while (targetDistance >= currentDistance);
 stop();
 }
