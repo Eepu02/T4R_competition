@@ -1,5 +1,6 @@
 #include "voidit.h"
 
+
 //ensimmäisen ohjaimen muuttujat
 bool firConLift = true;
 bool firConRN = true;
@@ -78,22 +79,19 @@ void tankD()  {
     else if (secConLift && C2.get_digital(DIGITAL_L2) &&
              !Bumper.get_value()) lowerLift();
 
-    else if (firConLift && C1.get_digital(DIGITAL_UP) && // kun RN liikkuu ylös nostin nousee myös
-             PotRN.get_value() > 1840 && Bumper.get_value()) {
-                if(PotRN.get_value() < 1900) raiseLift();
-    }
-    else if (secConLift && PotRN.get_value() > 1840 && Bumper.get_value()) {
-                if(PotRN.get_value() < 1900) raiseLift();
-    }
     else stopLift();
 
 
     // kerääjän liike
     // collector movement
 
+    if (PotRN.get_value() > hidVal) rnSpeed = CoS();
+    else rnSpeed = 127;
 
-    if (firConCollector && C1.get_digital(DIGITAL_R1)) startIntake();
-    else if (secConCollector &&  C2.get_digital(DIGITAL_R1)) startIntake();
+    if (firConCollector && C1.get_digital(DIGITAL_R1)) startIntake(rnSpeed);
+    else if (secConCollector &&  C2.get_digital(DIGITAL_R1)) startIntake(rnSpeed);
+
+
 
     else if (firConCollector && C1.get_digital(DIGITAL_R2)) reverseIntake();
     else if (secConCollector && C2.get_digital(DIGITAL_R2)) reverseIntake();
