@@ -2,6 +2,7 @@
 #include "main.h"
 
 
+
 // Define default speeds for various robot mechanisms
 int defaultTraySpeed = 127;
 int defaultLiftSpeed = 127;
@@ -290,6 +291,8 @@ void track(void* param) {
    /*                                                      */
    /*------------------------------------------------------*/
 
+   printf("kauha: %d\n", Nostin.get_encoder_units());
+
    // Gets latest encoder values
    getEncoderValues();
 
@@ -404,7 +407,7 @@ double getDirection() {
 //   }
 // }
 
-void turn (bool slow, double targetHeading, int speed) {
+void turn (double targetHeading, int speed, bool slow = true) {
   double raja = 0.2;
   int minSpeed = 30;
   double error = heading * (180 / M_PI) - targetHeading;
