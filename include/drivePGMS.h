@@ -1,7 +1,7 @@
 #include "voidit.h"
 
 
-//ensimmäisen ohjaimen muuttujat
+//variables for controller1
 bool firConLift = true;
 bool firConRN = true;
 bool firConCollector = true;
@@ -9,7 +9,7 @@ bool firConDriv = true;
 bool firConDrivSide = true;
 
 
-// toisen ohjaimen muuttujat
+// variables fo second controller
 bool secConLift = true;
 bool secConRN = true;
 bool secConCollector = true;
@@ -37,10 +37,10 @@ int speed = 127;
 
 
 //arcade ajon muuttujat
-int Y1, X1;         //Vertical, Horizontal Joystick Values for C1
-int Y2, X2;         // Vertical, Horizontal Joystick Values for C2
-int rotation1;      //rotation1 Joystick Values for C1
-int rotation2;     // rotation1 Joystick Values for C2
+int Y1, X1;         //Vertical, Horizontal Joystick Values for Controller1
+int Y2, X2;         // Vertical, Horizontal Joystick Values for Controller2
+int rotation1;      //rotation1 Joystick Values for Controller1
+int rotation2;     // rotation1 Joystick Values for Controller2
 double deadband = 20;   // Threshold value for deadzone
 
 
@@ -50,21 +50,21 @@ void tankD()  {
 
 
    // Tank driving code
-   if (firConDriv && abs(C1.get_analog(ANALOG_RIGHT_Y)) > 5 |
-       abs(C1.get_analog(ANALOG_LEFT_Y)) > 5) {
-     setRightSpeed(C1.get_analog(ANALOG_RIGHT_Y));
-     setLeftSpeed(C1.get_analog(ANALOG_LEFT_Y));
+   if (firConDriv && abs(Controller1.get_analog(ANALOG_RIGHT_Y)) > 5 |
+       abs(Controller1.get_analog(ANALOG_LEFT_Y)) > 5) {
+     setRightSpeed(Controller1.get_analog(ANALOG_RIGHT_Y));
+     setLeftSpeed(Controller1.get_analog(ANALOG_LEFT_Y));
    }
-   else if (SecConDriv && abs(C2.get_analog(ANALOG_RIGHT_Y)) > 5 |
-            abs(C2.get_analog(ANALOG_LEFT_Y)) > 5) {
-     setRightSpeed(C2.get_analog(ANALOG_RIGHT_Y));
-     setLeftSpeed(C2.get_analog(ANALOG_LEFT_Y));
+   else if (SecConDriv && abs(Controller2.get_analog(ANALOG_RIGHT_Y)) > 5 |
+            abs(Controller2.get_analog(ANALOG_LEFT_Y)) > 5) {
+     setRightSpeed(Controller2.get_analog(ANALOG_RIGHT_Y));
+     setLeftSpeed(Controller2.get_analog(ANALOG_LEFT_Y));
    }
-   else if (firConDrivSide && C1.get_digital(DIGITAL_RIGHT)) moveRight(speed);
-   else if (SecConDrivSide && C2.get_digital(DIGITAL_RIGHT)) moveRight(speed);
+   else if (firConDrivSide && Controller1.get_digital(DIGITAL_RIGHT)) moveRight(speed);
+   else if (SecConDrivSide && Controller2.get_digital(DIGITAL_RIGHT)) moveRight(speed);
 
-   else if (firConDrivSide && C1.get_digital(DIGITAL_LEFT)) moveLeft(speed);
-   else if (SecConDrivSide && C2.get_digital(DIGITAL_LEFT)) moveLeft(speed);
+   else if (firConDrivSide && Controller1.get_digital(DIGITAL_LEFT)) moveLeft(speed);
+   else if (SecConDrivSide && Controller2.get_digital(DIGITAL_LEFT)) moveLeft(speed);
 
    else stop();
 
@@ -72,11 +72,11 @@ void tankD()  {
     //kauhan varsien liike
     //movement of collector liftx
 
-    if (firConLift && C1.get_digital(DIGITAL_L1) && Nostin.get_encoder_units() < 3000) raiseLift();
-    else if (secConLift && C2.get_digital(DIGITAL_L1)) raiseLift();
+    if (firConLift && Controller1.get_digital(DIGITAL_L1) && Lift.get_encoder_units() < 3000) raiseLift();
+    else if (secConLift && Controller2.get_digital(DIGITAL_L1)) raiseLift();
 
-    else if (firConLift && C1.get_digital(DIGITAL_L2) && !Bumper.get_value()) lowerLift();
-    else if (secConLift && C2.get_digital(DIGITAL_L2) &&
+    else if (firConLift && Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) lowerLift();
+    else if (secConLift && Controller2.get_digital(DIGITAL_L2) &&
              !Bumper.get_value()) lowerLift();
 
     else stopLift();
@@ -88,19 +88,19 @@ void tankD()  {
     if (PotRN.get_value() > hidVal) rnSpeed = CoS();
     else rnSpeed = 127;
 
-    if (firConCollector && C1.get_digital(DIGITAL_R1)) startIntake(rnSpeed);
-    else if (secConCollector &&  C2.get_digital(DIGITAL_R1)) startIntake(rnSpeed);
+    if (firConCollector && Controller1.get_digital(DIGITAL_R1)) startIntake(rnSpeed);
+    else if (secConCollector &&  Controller2.get_digital(DIGITAL_R1)) startIntake(rnSpeed);
 
 
 
-    else if (firConCollector && C1.get_digital(DIGITAL_R2)) reverseIntake();
-    else if (secConCollector && C2.get_digital(DIGITAL_R2)) reverseIntake();
+    else if (firConCollector && Controller1.get_digital(DIGITAL_R2)) reverseIntake();
+    else if (secConCollector && Controller2.get_digital(DIGITAL_R2)) reverseIntake();
 
-    else if (firConCollector && (PotRN.get_value() > 3200 && C1.get_digital(DIGITAL_R2))) reverseIntake(40);
-    else if (secConCollector && (PotRN.get_value() > 3200 && C2.get_digital(DIGITAL_R2))) reverseIntake(40);
+    else if (firConCollector && (PotRN.get_value() > 3200 && Controller1.get_digital(DIGITAL_R2))) reverseIntake(40);
+    else if (secConCollector && (PotRN.get_value() > 3200 && Controller2.get_digital(DIGITAL_R2))) reverseIntake(40);
 
-    // else if (firConCollector && C1.get_digital(DIGITAL_A)) keraajaLiike(2, 40);
-    // else if (secConCollector && C2.get_digital(DIGITAL_A)) keraajaLiike(2, 40);
+    // else if (firConCollector && Controller1.get_digital(DIGITAL_A)) keraajaLiike(2, 40);
+    // else if (secConCollector && Controller2.get_digital(DIGITAL_A)) keraajaLiike(2, 40);
 
     else stopIntake();
 
@@ -110,11 +110,11 @@ void tankD()  {
     if(PotRN.get_value() > hidVal)  rnSpeed = CoS();
     else rnSpeed = 127;
 
-    if(firConRN && C1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
-    else if(secConRN && C2.get_digital(DIGITAL_UP) && PotRN.get_value() < maxVal) raiseTray(rnSpeed);
+    if(firConRN && Controller1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
+    else if(secConRN && Controller2.get_digital(DIGITAL_UP) && PotRN.get_value() < maxVal) raiseTray(rnSpeed);
 
-    else if(firConRN && C1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
-    else if(secConRN && C2.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
+    else if(firConRN && Controller1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
+    else if(secConRN && Controller2.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
 
     else stopTray();
 
@@ -131,14 +131,14 @@ void arcadeDrive() {
 
       //arcade driving code
 
-      if (firConDriv) {  Y1 = C1.get_analog(ANALOG_RIGHT_Y); // Vertical   axis
-                         X1 = C1.get_analog(ANALOG_RIGHT_X);}  // Horizontal axis
+      if (firConDriv) {  Y1 = Controller1.get_analog(ANALOG_RIGHT_Y); // Vertical   axis
+                         X1 = Controller1.get_analog(ANALOG_RIGHT_X);}  // Horizontal axis
 
-      else if (SecConDriv) {  Y2 = C2.get_analog(ANALOG_RIGHT_Y); // Vertical   axis
-                              X2 = C2.get_analog(ANALOG_RIGHT_X);}  // Horizontal axis<
+      else if (SecConDriv) {  Y2 = Controller2.get_analog(ANALOG_RIGHT_Y); // Vertical   axis
+                              X2 = Controller2.get_analog(ANALOG_RIGHT_X);}  // Horizontal axis<
 
-      if (firConDriv) rotation1 = C1.get_analog(ANALOG_LEFT_X); // rotation1   axis
-      else if (SecConDriv) rotation2 = C2.get_analog(ANALOG_LEFT_X);
+      if (firConDriv) rotation1 = Controller1.get_analog(ANALOG_LEFT_X); // rotation1   axis
+      else if (SecConDriv) rotation2 = Controller2.get_analog(ANALOG_LEFT_X);
 
       // Implement dead zones to compensate for joystick values
       // not always returning to zero
@@ -150,31 +150,31 @@ void arcadeDrive() {
       else if (SecConDriv && abs(rotation2) < deadband) rotation2 = 0;
 
       // Convert joystick values to motor speeds
-      if (firConDriv)EtuOikea.move(Y1 - X1 - rotation1);
-      else if (SecConDriv) EtuOikea.move(Y2 - X2 - rotation2);
+      if (firConDriv)RightFrontDrive.move(Y1 - X1 - rotation1);
+      else if (SecConDriv) RightFrontDrive.move(Y2 - X2 - rotation2);
 
-       if (firConDriv)TakaOikea.move(Y1 + X1 - rotation1);
-       else if (SecConDriv) TakaOikea.move(Y2 + X2 - rotation2);
+       if (firConDriv)RightBackDrive.move(Y1 + X1 - rotation1);
+       else if (SecConDriv) RightBackDrive.move(Y2 + X2 - rotation2);
 
-      if (firConDriv)  EtuVasen.move(Y1 + X1 + rotation1);
-      else if (SecConDriv) EtuVasen.move(Y2 + X2 + rotation2);
+      if (firConDriv)  LeftFrontDrive.move(Y1 + X1 + rotation1);
+      else if (SecConDriv) LeftFrontDrive.move(Y2 + X2 + rotation2);
 
-      if (firConDriv)  TakaVasen.move(Y1 - X1 + rotation1);
-      else if (SecConDriv) TakaVasen.move(Y2 - X2 + rotation2);
+      if (firConDriv)  LeftBackDrive.move(Y1 - X1 + rotation1);
+      else if (SecConDriv) LeftBackDrive.move(Y2 - X2 + rotation2);
 
 
       //kauhan varsien liike
       //movement of collector liftx
-      Nostin.set_encoder_units(MOTOR_ENCODER_DEGREES);
+      Lift.set_encoder_units(MOTOR_ENCODER_DEGREES);
 
-      if (firConLift && C1.get_digital(DIGITAL_L1) && Nostin.get_encoder_units() < 3000) raiseLift();
-      else if (secConLift && C2.get_digital(DIGITAL_L1)) lowerLift();
+      if (firConLift && Controller1.get_digital(DIGITAL_L1) && Lift.get_encoder_units() < 3000) raiseLift();
+      else if (secConLift && Controller2.get_digital(DIGITAL_L1)) lowerLift();
 
-      else if (firConLift && C1.get_digital(DIGITAL_L2) && !Bumper.get_value()) lowerLift();
-      else if (secConLift && C2.get_digital(DIGITAL_L2) &&
+      else if (firConLift && Controller1.get_digital(DIGITAL_L2) && !Bumper.get_value()) lowerLift();
+      else if (secConLift && Controller2.get_digital(DIGITAL_L2) &&
                !Bumper.get_value()) lowerLift();
 
-      else if (firConLift && C1.get_digital(DIGITAL_UP) && // kun RN liikkuu ylös nostin nousee myös
+      else if (firConLift && Controller1.get_digital(DIGITAL_UP) && // kun RN liikkuu ylös nostin nousee myös
                PotRN.get_value() > 1840 && Bumper.get_value()) {
                   if(PotRN.get_value() < 1900) raiseLift();
       }
@@ -188,14 +188,14 @@ void arcadeDrive() {
       // collector movement
 
 
-      if (firConCollector && C1.get_digital(DIGITAL_R1)) startIntake();
-      else if (secConCollector &&  C2.get_digital(DIGITAL_R1)) startIntake();
+      if (firConCollector && Controller1.get_digital(DIGITAL_R1)) startIntake();
+      else if (secConCollector &&  Controller2.get_digital(DIGITAL_R1)) startIntake();
 
-      else if (firConCollector && C1.get_digital(DIGITAL_R2)) reverseIntake();
-      else if (secConCollector && C2.get_digital(DIGITAL_R2)) reverseIntake();
+      else if (firConCollector && Controller1.get_digital(DIGITAL_R2)) reverseIntake();
+      else if (secConCollector && Controller2.get_digital(DIGITAL_R2)) reverseIntake();
 
-      else if (firConCollector && C1.get_digital(DIGITAL_A)) reverseIntake(10);
-      else if (secConCollector && C1.get_digital(DIGITAL_A)) reverseIntake(10);
+      else if (firConCollector && Controller1.get_digital(DIGITAL_A)) reverseIntake(10);
+      else if (secConCollector && Controller1.get_digital(DIGITAL_A)) reverseIntake(10);
 
       else stopIntake();
 
@@ -205,11 +205,11 @@ void arcadeDrive() {
       if(PotRN.get_value() > hidVal)  rnSpeed = CoS();
       else rnSpeed = 127;
 
-      if(firConRN && C1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
-      else if(secConRN && C2.get_digital(DIGITAL_UP) && PotRN.get_value() < maxVal) raiseTray(rnSpeed);
+      if(firConRN && Controller1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
+      else if(secConRN && Controller2.get_digital(DIGITAL_UP) && PotRN.get_value() < maxVal) raiseTray(rnSpeed);
 
-      else if(firConRN && C1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
-      else if(secConRN && C2.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
+      else if(firConRN && Controller1.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
+      else if(secConRN && Controller2.get_digital(DIGITAL_DOWN) && PotRN.get_value() > alVal) lowerTray(127);
 
       else stopTray();
 

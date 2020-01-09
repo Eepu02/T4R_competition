@@ -8,8 +8,6 @@ int defaultTraySpeed = 127;
 int defaultLiftSpeed = 127;
 int defaultCollectorSpeed = 127;
 
-bool win;
-bool eneble;
 
 pros::Mutex mutex;
 
@@ -29,19 +27,19 @@ void resetEncoders() {
 // Resets all drive motor internal encoders
 void resetDriveMotors ()
 {
-  EtuOikea.tare_position();
-  TakaOikea.tare_position();
-  EtuVasen.tare_position();
-  TakaVasen.tare_position();
-  Nostin.tare_position();
-  Nostin.set_encoder_units(MOTOR_ENCODER_DEGREES);
+  RightFrontDrive.tare_position();
+  RightBackDrive.tare_position();
+  LeftFrontDrive.tare_position();
+  LeftBackDrive.tare_position();
+  Lift.tare_position();
+  Lift.set_encoder_units(MOTOR_ENCODER_DEGREES);
 }
 
 void setup() {
-   KerainVasen.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+   CollectorLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
    KerainOikea.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-   Nostin.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-   RampinNostin.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+   Lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+   RampLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
    resetDriveMotors();
    resetEncoders();
 
@@ -64,29 +62,29 @@ double average (float x, float y) {
 // sets speed for right side drive
 void setRightSpeed(int speed)
 {
-  EtuOikea.move(speed);
-  TakaOikea.move(speed);
+  RightFrontDrive.move(speed);
+  RightBackDrive.move(speed);
 }
 
 // sets speed for left side drive
 void setLeftSpeed(int speed)
 {
-  EtuVasen.move(speed);
-  TakaVasen.move(speed);
+  LeftFrontDrive.move(speed);
+  LeftBackDrive.move(speed);
 }
 
 // sets speed for forward-left and backward-right motors
 void setNorthWestSpeed(int speed)
 {
-  EtuVasen.move(speed);
-  TakaOikea.move(speed);
+  LeftFrontDrive.move(speed);
+  RightBackDrive.move(speed);
 }
 
 // sets speeds for forward-right and backward-left motors
 void setNorthEastSpeed(int speed)
 {
-  EtuOikea.move(speed);
-  TakaVasen.move(speed);
+  RightFrontDrive.move(speed);
+  LeftBackDrive.move(speed);
 }
 
 void moveForward(int speed) {
@@ -129,9 +127,9 @@ void moveLift (int YA, int speed = defaultLiftSpeed)
 {
   switch (YA)
   {
-   case 1: Nostin.move(speed);  break;
-   case 2: Nostin.move(-speed); break;
-   case 3: Nostin.move(0);      break;
+   case 1: Lift.move(speed);  break;
+   case 2: Lift.move(-speed); break;
+   case 3: Lift.move(0);      break;
   }
 }
 
@@ -150,9 +148,9 @@ void stopLift() {
 // function to control cube collector movement
 void moveIntake (int heading, int speed = defaultCollectorSpeed) {
   switch(heading) {
-    case 1:   KerainOikea.move(speed);  KerainVasen.move(speed);   break;
-    case 2:   KerainOikea.move(-speed); KerainVasen.move(-speed);  break;
-    case 3:   KerainOikea.move(0);      KerainVasen.move(0);       break;
+    case 1:   KerainOikea.move(speed);  CollectorLeft.move(speed);   break;
+    case 2:   KerainOikea.move(-speed); CollectorLeft.move(-speed);  break;
+    case 3:   KerainOikea.move(0);      CollectorLeft.move(0);       break;
     default:  printf("Error selecting case for moveIntake\n");     break;
   }
 }
@@ -172,9 +170,9 @@ void stopIntake() {
 // function for controlling cube tray movement
 void moveTray (int heading, int speed = defaultTraySpeed) {
   switch (heading) {
-    case 1:   RampinNostin.move(speed);                 break;
-    case 2:   RampinNostin.move(-speed);                break;
-    case 3:   RampinNostin.move(0);                     break;
+    case 1:   RampLift.move(speed);                 break;
+    case 2:   RampLift.move(-speed);                break;
+    case 3:   RampLift.move(0);                     break;
     default:  printf("Error selecting case for RN\n");  break;
   }
 }
@@ -195,25 +193,29 @@ void stopTray() {
 void autoUnfold() {
 
   // setup
-  Nostin.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-  RampinNostin.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-  Nostin.tare_position();
-  RampinNostin.tare_position();
+  Lift.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+  RampLift.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+  Lift.tare_position();
+  RampLift.tare_position();
 
   // Fold out intakes
   do {
     raiseTray();
   } while(PotRN.get_value() < 4095); //1060
-  RampinNostin.move_absolute(30, 127);
+  reverseIntake(70);
+  sleep(3000);
+  stopIntake();
+
+  RampLift.move_absolute(30, 127);
 
   /*while(!C1.get_digital(DIGITAL_X)) sleep(20);
   // Fold out tray
-  RampinNostin.move_absolute(0, 127);
+  RampLift.move_absolute(0, 127);
   raiseLift();
-  while(Nostin.get_position() < 1300) sleep(20);
+  while(Lift.get_position() < 1300) sleep(20);
 
   // Reset lift
-  Nostin.move_absolute(0, 127);
+  Lift.move_absolute(0, 127);
   sleep(5000);*/
 
 }
@@ -291,7 +293,7 @@ void track(void* param) {
    /*                                                      */
    /*------------------------------------------------------*/
 
-   printf("kauha: %d\n", Nostin.get_encoder_units());
+   printf("kauha: %d\n", Lift.get_encoder_units());
 
    // Gets latest encoder values
    getEncoderValues();
@@ -489,8 +491,7 @@ float kuljettumatka;
 float currentDistance;
 float uusiArvo;
 
-void forward(float targetDistance, int angle, int speed, float speedScale = 0.97)
-{
+void forward(float targetDistance, int angle, int speed, float speedScale = 0.97) {
     float error;
     resetEncoders();
     sleep(100);
@@ -536,8 +537,7 @@ void forward(float targetDistance, int angle, int speed, float speedScale = 0.97
 }
 // drives straight backward using cm
 
-void backward(float targetDistance, int angle, int speed, float speedScale = 0.97)
-{
+void backward(float targetDistance, int angle, int speed, float speedScale = 0.97) {
   float error;
   resetEncoders();
   sleep(100);
