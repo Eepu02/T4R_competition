@@ -11,7 +11,7 @@ void initialize() {
 	//pros::lcd::initialize();
 	//pros::lcd::print(0, "%d\n", encoderBack.get_value());
 	setup();
-	eneble = true;
+
 }
 
 /**
@@ -20,7 +20,7 @@ void initialize() {
  * the robot is enabled, this task will exit.
  */
 void disabled() {
-	eneble = true;
+
 }
 
 /**
@@ -33,8 +33,7 @@ void disabled() {
  * starts.
  */
 void competition_initialize() {
-	win = true;
-	eneble = false;
+
 }
 
 /**
@@ -49,9 +48,10 @@ void competition_initialize() {
  * from where it left off.
  */
 
-void autonomous() {
-win = false;
-eneble = false;
+void autonomous()
+{
+
+	autoUnfold();
 }
 
 /**
@@ -87,7 +87,7 @@ void opcontrol() {
 
 	pros::Task my_cpp_task (track_task);
 //	turn(90, 127);
-	//seessamaukene();
+	//sesamOpen();
 	//read();
 	while(1)	{
 	 	// int potVal = PotRN.get_value();
