@@ -35,6 +35,7 @@ void resetDriveMotors ()
   Lift.set_encoder_units(MOTOR_ENCODER_DEGREES);
 }
 
+// Sets up all proper break modes, encoder resets, etc...
 void setup() {
    CollectorLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
    KerainOikea.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -45,7 +46,7 @@ void setup() {
 
 }
 
-// sensor debugging function
+// Sensor debugging function
 void printSensorValues() {
   printf("Encoder back: %d\n", encoderBack.get_value());
   printf("Encoder left: %d\n", encoderLeft.get_value());
@@ -87,31 +88,37 @@ void setNorthEastSpeed(int speed)
   LeftBackDrive.move(speed);
 }
 
+// Low level function for moving forward
 void moveForward(int speed) {
   setRightSpeed(speed);
   setLeftSpeed(speed);
 }
 
+// Low level function for moving backward
 void movedBackward(int speed) {
   setRightSpeed(-speed);
   setLeftSpeed(-speed);
 }
 
+// Moving right with mecanum wheels
 void moveRight(int speed) {
   setNorthWestSpeed(speed);
   setNorthEastSpeed(-speed);
 }
 
+// Moving left with mecanum wheels
 void moveLeft(int speed) {
   setNorthWestSpeed(-speed);
   setNorthEastSpeed(speed);
 }
 
+// Simple turn to right
 void turnRight(int speed) {
   setLeftSpeed(speed);
   setRightSpeed(-speed);
 }
 
+// Simple turn to left
 void turnLeft(int speed) {
   setLeftSpeed(-speed);
   setRightSpeed(speed);
@@ -122,14 +129,14 @@ void stop() {
   setLeftSpeed(0);
 }
 
-// function to control cube collector movement
+// Function to control cube collector movement
 void moveLift (int YA, int speed = defaultLiftSpeed)
 {
   switch (YA)
   {
-   case 1: Lift.move(speed);  break;
-   case 2: Lift.move(-speed); break;
-   case 3: Lift.move(0);      break;
+   case 1: Lift.move(speed);  break; // Raise
+   case 2: Lift.move(-speed); break; // Lower
+   case 3: Lift.move(0);      break; // Stop
   }
 }
 
@@ -145,13 +152,13 @@ void stopLift() {
   moveLift(3);
 }
 
-// function to control cube collector movement
+// Function to control cube intake movement
 void moveIntake (int heading, int speed = defaultCollectorSpeed) {
   switch(heading) {
-    case 1:   KerainOikea.move(speed);  CollectorLeft.move(speed);   break;
-    case 2:   KerainOikea.move(-speed); CollectorLeft.move(-speed);  break;
-    case 3:   KerainOikea.move(0);      CollectorLeft.move(0);       break;
-    default:  printf("Error selecting case for moveIntake\n");     break;
+    case 1:   KerainOikea.move(speed);  CollectorLeft.move(speed);   break; // Collect
+    case 2:   KerainOikea.move(-speed); CollectorLeft.move(-speed);  break; // Reverse
+    case 3:   KerainOikea.move(0);      CollectorLeft.move(0);       break; // Stop
+    default:  printf("Error selecting case for moveIntake\n");       break;
   }
 }
 
@@ -167,12 +174,12 @@ void stopIntake() {
   moveIntake(3);
 }
 
-// function for controlling cube tray movement
+// Function for controlling cube tray movement
 void moveTray (int heading, int speed = defaultTraySpeed) {
   switch (heading) {
-    case 1:   RampLift.move(speed);                 break;
-    case 2:   RampLift.move(-speed);                break;
-    case 3:   RampLift.move(0);                     break;
+    case 1:   RampLift.move(speed);                     break; // Raise
+    case 2:   RampLift.move(-speed);                    break; // Lower
+    case 3:   RampLift.move(0);                         break; // Stop
     default:  printf("Error selecting case for RN\n");  break;
   }
 }
@@ -206,19 +213,16 @@ void autoUnfold() {
   sleep(3000);
   stopIntake();
 
+  // Reset tray to back down
   RampLift.move_absolute(30, 127);
 
-  /*while(!C1.get_digital(DIGITAL_X)) sleep(20);
-  // Fold out tray
-  RampLift.move_absolute(0, 127);
-  raiseLift();
-  while(Lift.get_position() < 1300) sleep(20);
-
-  // Reset lift
-  Lift.move_absolute(0, 127);
-  sleep(5000);*/
-
 }
+
+/*------------------------------------------------------*/
+/*                                                      */
+/*             ODOMETRY (WORK IN PROGRESS)              */
+/*                                                      */
+/*------------------------------------------------------*/
 
 // Tracking wheels' distance to tracking center
 // Values from CAD model
@@ -308,6 +312,8 @@ void track(void* param) {
    // printf("Kulma: %f\n", heading * (180 / M_PI));
    mutex.give();
 
+   //---WORK IN PROGRESS---//
+
    // double theta = (-180*())
 
    /*double gamma = M_PI - (M_PI/4) - (deltaHeading/2);
@@ -391,6 +397,7 @@ void track(void* param) {
  }
 }
 
+// Returns the latest heading in degrees
 double getDirection() {
   // Gets latest encoder values
   getEncoderValues();
@@ -402,22 +409,22 @@ double getDirection() {
   return heading += deltaHeading * (180 / M_PI);
 }
 
-// void read() {
-//   while(1) {
-//     printf("Heading toisessa paikassa: %f\n", *ptr);
-//     sleep(100);
-//   }
-// }
-
+// Precise turning function
 void turn (double targetHeading, int speed, bool slow = true) {
   double raja = 0.2;
   int minSpeed = 30;
+
+  // Compute error
   double error = heading * (180 / M_PI) - targetHeading;
+
+  // Check which way to turn
   if (targetHeading < error) {
     do {
     mutex.take(20);
      error = heading * (180 / M_PI) - targetHeading;
      mutex.give();
+
+     // Slow speed if we're close to target
      if (slow) {
        if(fabs(error) < double(speed)) {
          speed = round(fabs(error)) * 6;
@@ -427,13 +434,15 @@ void turn (double targetHeading, int speed, bool slow = true) {
      turnLeft(speed);
      sleep(20);
     }
+
+    // Repeat while error is above a treshold
     while (fabs(error) > raja);
     stop();
   }
   if (targetHeading > error) {
     do {
       error = heading * (180 / M_PI) - targetHeading;
-      // printf("Error: %f\n", error);
+      // Slow speed if we're close to target
       if (slow) {
         if(fabs(error) < double(speed)) {
           speed = round(fabs(error));
@@ -444,12 +453,14 @@ void turn (double targetHeading, int speed, bool slow = true) {
       turnRight(speed);
       sleep(20);
     }
+    // Repeat while error is above a treshold
     while (fabs(error) > raja);
     stop();
     printf("Error: %f\n", error);
   }
 }
 
+// A basic PID loop. Work in progress
 void PID(float target) {
   float kp = 0.0;
   float ki = 0.0;
@@ -485,6 +496,8 @@ void PID(float target) {
 
   }
 }
+
+// Functions for moving straight using heading.
 double gyroValue;
 //double error;
 float kuljettumatka;
@@ -535,7 +548,6 @@ void forward(float targetDistance, int angle, int speed, float speedScale = 0.97
   }while (targetDistance >= currentDistance);
   stop();
 }
-// drives straight backward using cm
 
 void backward(float targetDistance, int angle, int speed, float speedScale = 0.97) {
   float error;
