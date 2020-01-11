@@ -201,7 +201,7 @@ void autoUnfold() {
   // Fold out intakes
   do {
     raiseTray();
-  } while(PotRN.get_value() < 4095); //1060
+  } while(PotRN.get_value() < 3900); //1060
   reverseIntake(70);
   sleep(3000);
   stopIntake();

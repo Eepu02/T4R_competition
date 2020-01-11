@@ -50,8 +50,35 @@ void competition_initialize() {
 
 void autonomous()
 {
+	// Create tracking task with a priority of 10 (default 8);
+	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
+								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
+	//autoUnfold();
+
+	pros::Task my_cpp_task (track_task);
 
 	autoUnfold();
+
+	startIntake();
+	moveForward(50);
+	sleep(1500);
+	stopIntake();
+	movedBackward(60);
+	sleep(1500);
+	turnLeft(60);
+	sleep(1600);
+	moveForward(60);
+	sleep(2000);
+	reverseIntake();
+	sleep(500);
+	turnLeft(60);
+	sleep(500);
+	movedBackward(100);
+	sleep(750);
+	stop();
+	stopIntake();
+
+
 }
 
 /**
@@ -80,12 +107,6 @@ void opcontrol() {
 
 	//resetEncoders();
 
-	// Create tracking task with a priority of 10 (default 8);
-	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
-								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
-	//autoUnfold();
-
-	pros::Task my_cpp_task (track_task);
 //	turn(90, 127);
 	//sesamOpen();
 	//read();
