@@ -57,26 +57,27 @@ void autonomous()
 
 	pros::Task my_cpp_task (track_task);
 
-	autoUnfold();
-
-	startIntake();
-	moveForward(50);
-	sleep(1500);
-	stopIntake();
-	movedBackward(60);
-	sleep(1500);
-	turnLeft(60);
-	sleep(1600);
-	moveForward(60);
-	sleep(2000);
-	reverseIntake();
-	sleep(500);
-	turnLeft(60);
-	sleep(500);
-	movedBackward(100);
-	sleep(750);
-	stop();
-	stopIntake();
+	turn(-80.5, 127,true); //80.5 oikealle, systemaattinen virhe
+	// autoUnfold();
+	//
+	// startIntake();
+	// moveForward(50);
+	// sleep(1500);
+	// stopIntake();
+	// movedBackward(60);
+	// sleep(1500);
+	// turnLeft(60);
+	// sleep(1600);
+	// moveForward(60);
+	// sleep(2000);
+	// reverseIntake();
+	// sleep(500);
+	// turnLeft(60);
+	// sleep(500);
+	// movedBackward(100);
+	// sleep(750);
+	// stop();
+	// stopIntake();
 
 
 }

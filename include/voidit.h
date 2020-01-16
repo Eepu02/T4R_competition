@@ -55,7 +55,7 @@ void printSensorValues() {
   pros::delay(100);
 }
 
-double average (float x, float y) {
+double average(float x, float y) {
   return (x + y) / 2;
  }
 
@@ -286,6 +286,7 @@ void track(void* param) {
  double  globalX = 0;
  double  globalY = 0;
  double  radius  = 0;
+ double lastHeading = 0;
  while (1) {
    /*------------------------------------------------------*/
    /*                                                      */
@@ -293,7 +294,7 @@ void track(void* param) {
    /*                                                      */
    /*------------------------------------------------------*/
 
-   printf("kauha: %d\n", Lift.get_encoder_units());
+   // printf("kauha: %d\n", Lift.get_encoder_units());
 
    // Gets latest encoder values
    getEncoderValues();
@@ -301,12 +302,17 @@ void track(void* param) {
    // Compute change in orientation
    deltaHeading = getHeading();
 
-   // The new orientation is the previous orientation plus the change
-   mutex.take(5);
-   heading += deltaHeading;
+   if(fabs(deltaHeading) < 1) {
 
-   // printf("Kulma: %f\n", heading * (180 / M_PI));
-   mutex.give();
+     // The new orientation is the previous orientation plus the change
+     mutex.take(5);
+     heading += deltaHeading;
+
+     // printf("Kulma: %f\n", heading * (180 / M_PI));
+     mutex.give();
+
+     lastHeading = deltaHeading;
+   }
 
    // double theta = (-180*())
 
@@ -391,16 +397,16 @@ void track(void* param) {
  }
 }
 
-double getDirection() {
-  // Gets latest encoder values
-  getEncoderValues();
-
-  // Compute change in orientation
-  deltaHeading = getHeading();
-
-  // The new orientation is the previous orientation plus the change
-  return heading += deltaHeading * (180 / M_PI);
-}
+// double getDirection() {
+//   // Gets latest encoder values
+//   getEncoderValues();
+//
+//   // Compute change in orientation
+//   deltaHeading = getHeading();
+//
+//   // The new orientation is the previous orientation plus the change
+//   return heading += deltaHeading * (180 / M_PI);
+// }
 
 // void read() {
 //   while(1) {
@@ -412,42 +418,66 @@ double getDirection() {
 void turn (double targetHeading, int speed, bool slow = true) {
   double raja = 0.2;
   int minSpeed = 30;
-  double error = heading * (180 / M_PI) - targetHeading;
-  if (targetHeading < error) {
-    do {
-    mutex.take(20);
-     error = heading * (180 / M_PI) - targetHeading;
-     mutex.give();
-     if (slow) {
-       if(fabs(error) < double(speed)) {
-         speed = round(fabs(error)) * 6;
-         if(speed < minSpeed) speed = minSpeed;
-       }
-     }
-     turnLeft(speed);
-     sleep(20);
-    }
-    while (fabs(error) > raja);
-    stop();
-  }
-  if (targetHeading > error) {
-    do {
-      error = heading * (180 / M_PI) - targetHeading;
-      // printf("Error: %f\n", error);
-      if (slow) {
-        if(fabs(error) < double(speed)) {
-          speed = round(fabs(error));
-          if(speed < minSpeed) speed = minSpeed;
-        }
-      }
-      printf("speed: %d\n", speed);
-      turnRight(speed);
-      sleep(20);
-    }
-    while (fabs(error) > raja);
-    stop();
-    printf("Error: %f\n", error);
-  }
+  int nopeus;
+  int constant;
+  double error = targetHeading - heading * (180 / M_PI);
+
+  do {
+    error = targetHeading - heading * (180 / M_PI);
+    printf("Error: %f ", error);
+    printf("Heading: %f\n", heading * (180 / M_PI));
+
+    if(error > 0) constant = 20;
+    else if(error < 0) constant = -20;
+    else constant = 0;
+    nopeus = round(error * 1.3 + constant);
+    if(nopeus < -127) nopeus = -127;
+    else if(nopeus > 127) nopeus = 127;
+
+    if(fabs(error) > 900) break;
+
+    turnRight(nopeus);
+    sleep(20);
+  } while(fabs(error) > raja);
+
+  printf("failed");
+  stop();
+
+  // if (targetHeading < error) {
+  //   do {
+  //   mutex.take(20);
+  //    error = heading * (180 / M_PI) - targetHeading;
+  //    mutex.give();
+  //    if (slow) {
+  //      if(fabs(error) < double(speed)) {
+  //        speed = round(fabs(error)) * 6;
+  //        if(speed < minSpeed) speed = minSpeed;
+  //      }
+  //    }
+  //    turnLeft(speed);
+  //    sleep(20);
+  //   }
+  //   while (fabs(error) > raja);
+  //   stop();
+  // }
+  // if (targetHeading > error) {
+  //   do {
+  //     error = heading * (180 / M_PI) - targetHeading;
+  //     // printf("Error: %f\n", error);
+  //     if (slow) {
+  //       if(fabs(error) < double(speed)) {
+  //         speed = round(fabs(error));
+  //         if(speed < minSpeed) speed = minSpeed;
+  //       }
+  //     }
+  //     printf("speed: %d\n", speed);
+  //     turnRight(speed);
+  //     sleep(20);
+  //   }
+  //   while (fabs(error) > raja);
+  //   stop();
+  //   printf("Error: %f\n", error);
+  // }
 }
 
 void PID(float target) {
@@ -492,48 +522,56 @@ float currentDistance;
 float uusiArvo;
 
 void forward(float targetDistance, int angle, int speed, float speedScale = 0.97) {
-    float error;
     resetEncoders();
-    sleep(100);
     getEncoderValues();
-    float alkuarvo = average(getDistance(el), getDistance(er));;
-    printf("alkuarvo: %f\n", currentDistance);
+    float raja = 0.2;
+    float lastDistance = 0;
+    float currentDistance = average(getDistance(DEl), getDistance(DEr));
+
+    float error = targetDistance - currentDistance;
 
     do {
-      getEncoderValues();
-
-      currentDistance = average(getDistance(el), getDistance(er));
-       gyroValue = heading;
-       error = angle - gyroValue;
-       if (currentDistance < targetDistance) sleep(10);
-       else if (currentDistance > targetDistance) currentDistance = currentDistance - alkuarvo;
-        moveForward(speed);
-
-      if (error > 0)
-      {
-          setLeftSpeed(speed);
-          setRightSpeed(speed * speedScale);
-      }
-      else if (error < 0)
-      {
-          setLeftSpeed(speed * speedScale);
-          setRightSpeed(speed);
-       }
-    else moveForward(speed);
-
-     double error = targetDistance - currentDistance;
-
-     if (error < 5) {
-       if (error * 10 < speed) speed = error * 10;
-     }
-
-     sleep(30);
-
-     printf("currentDistance: %f\n", currentDistance);
-     printf("uusiArvo: %f\n", uusiArvo);
-
-  }while (targetDistance >= currentDistance);
-  stop();
+      currentDistance = average(getDistance(DEl), getDistance(DEr));
+      error = targetDistance - currentDistance;
+      moveForward(error * 1.3);
+      sleep(20);
+    } while(fabs(error) > raja);
+  //
+  //   do {
+  //     getEncoderValues();
+  //
+  //     currentDistance = average(getDistance(el), getDistance(er));
+  //      gyroValue = heading;
+  //      error = angle - gyroValue;
+  //      if (currentDistance < targetDistance) sleep(10);
+  //      else if (currentDistance > targetDistance) currentDistance = currentDistance - alkuarvo;
+  //       moveForward(speed);
+  //
+  //     if (error > 0)
+  //     {
+  //         setLeftSpeed(speed);
+  //         setRightSpeed(speed * speedScale);
+  //     }
+  //     else if (error < 0)
+  //     {
+  //         setLeftSpeed(speed * speedScale);
+  //         setRightSpeed(speed);
+  //      }
+  //   else moveForward(speed);
+  //
+  //    double error = targetDistance - currentDistance;
+  //
+  //    if (error < 5) {
+  //      if (error * 10 < speed) speed = error * 10;
+  //    }
+  //
+  //    sleep(30);
+  //
+  //    printf("currentDistance: %f\n", currentDistance);
+  //    printf("uusiArvo: %f\n", uusiArvo);
+  //
+  // }while (targetDistance >= currentDistance);
+  // stop();
 }
 // drives straight backward using cm
 
