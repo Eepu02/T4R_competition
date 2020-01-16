@@ -222,9 +222,10 @@ void autoUnfold() {
 
 // Tracking wheels' distance to tracking center
 // Values from CAD model
-const float dr = 6.3202;
-const float dl = 7.62301;
-const float db = -3.125;
+const double dr = 6.3202;
+const double dl = 7.62301;
+const double db = -3.125;
+const double dm = 6.98144;
 
 // Tracking variables
 int er         = 0;
@@ -281,6 +282,20 @@ double getHeading() {
   return (getDistance(DEl) - getDistance(DEr)) / (dr + dl);
 }
 
+double getMotorDistance(double ticks, float d = 4.071) {
+  return M_PI * double(d) * (ticks / 900);
+}
+
+double getMotorHeading() {
+  double tickL = average(LeftFrontDrive.get_position(), LeftBackDrive.get_position());
+  double tickR = average(RightFrontDrive.get_position(), RightBackDrive.get_position());
+
+  double distanceL = getMotorDistance(tickL);
+  double distanceR = getMotorDistance(tickR);
+  // printf("distanceL: %f\n", average(distanceL, distanceR));
+  // printf("distanceR: %f\n", distanceR);
+  return ((distanceL - distanceR) / (dm + dm));
+}
 /* Local axis is offset from global axis by getHeading() / 2!!!*/
 void track(void* param) {
  double  globalX = 0;
@@ -301,6 +316,8 @@ void track(void* param) {
 
    // Compute change in orientation
    deltaHeading = getHeading();
+   // heading = getMotorHeading();
+   // printf("Kulma: %f\n", heading * (180 / M_PI));
 
    if(fabs(deltaHeading) < 1) {
 
@@ -521,21 +538,30 @@ float kuljettumatka;
 float currentDistance;
 float uusiArvo;
 
-void forward(float targetDistance, int angle, int speed, float speedScale = 0.97) {
+void forward(float targetDistance, int angle, int nopeus, float speedScale = 0.97) {
     resetEncoders();
     getEncoderValues();
     float raja = 0.2;
     float lastDistance = 0;
+    int minSpeed = 30;
+    double speed;
     float currentDistance = average(getDistance(DEl), getDistance(DEr));
 
     float error = targetDistance - currentDistance;
 
     do {
-      currentDistance = average(getDistance(DEl), getDistance(DEr));
+      currentDistance = average(getDistance(el), getDistance(er));
       error = targetDistance - currentDistance;
-      moveForward(error * 1.3);
+      speed = error * 1.3;
+      if(speed < minSpeed && speed > 0) speed = minSpeed;
+      else if(speed > -minSpeed && speed < 0) speed = -minSpeed;
+      moveForward(speed);
+      printf("Error: %f ", error);
+      printf("Current distance: %f\n", currentDistance);
       sleep(20);
     } while(fabs(error) > raja);
+
+    stop();
   //
   //   do {
   //     getEncoderValues();
