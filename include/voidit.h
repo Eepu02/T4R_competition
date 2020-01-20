@@ -441,8 +441,8 @@ void turn (double targetHeading, int speed, bool slow = true) {
 
   do {
     error = targetHeading - heading * (180 / M_PI);
-    printf("Error: %f ", error);
-    printf("Heading: %f\n", heading * (180 / M_PI));
+    // printf("Error: %f ", error);
+    // printf("Heading: %f\n", heading * (180 / M_PI));
 
     if(error > 0) constant = 20;
     else if(error < 0) constant = -20;
@@ -545,9 +545,8 @@ void forward(float targetDistance, int angle, int nopeus, float speedScale = 0.9
     float lastDistance = 0;
     int minSpeed = 30;
     double speed;
-    float currentDistance = average(getDistance(DEl), getDistance(DEr));
-
-    float error = targetDistance - currentDistance;
+    float currentDistance = 0;
+    float error;
 
     do {
       currentDistance = average(getDistance(el), getDistance(er));

@@ -57,7 +57,8 @@ void autonomous()
 
 	pros::Task my_cpp_task (track_task);
 
-forward(-12, 0, 127);
+	startIntake();
+	forward(12, 0, 127);
 	// turn(80.5, 127,true); //80.5 oikealle, systemaattinen virhe
 	// autoUnfold();
 	//
