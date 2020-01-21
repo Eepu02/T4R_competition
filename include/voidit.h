@@ -282,20 +282,20 @@ double getHeading() {
   return (getDistance(DEl) - getDistance(DEr)) / (dr + dl);
 }
 
-double getMotorDistance(double ticks, float d = 4.071) {
-  return M_PI * double(d) * (ticks / 900);
-}
-
-double getMotorHeading() {
-  double tickL = average(LeftFrontDrive.get_position(), LeftBackDrive.get_position());
-  double tickR = average(RightFrontDrive.get_position(), RightBackDrive.get_position());
-
-  double distanceL = getMotorDistance(tickL);
-  double distanceR = getMotorDistance(tickR);
-  // printf("distanceL: %f\n", average(distanceL, distanceR));
-  // printf("distanceR: %f\n", distanceR);
-  return ((distanceL - distanceR) / (dm + dm));
-}
+// double getMotorDistance(double ticks, float d = 4.071) {
+//   return M_PI * double(d) * (ticks / 900);
+// }
+//
+// double getMotorHeading() {
+//   double tickL = average(LeftFrontDrive.get_position(), LeftBackDrive.get_position());
+//   double tickR = average(RightFrontDrive.get_position(), RightBackDrive.get_position());
+//
+//   double distanceL = getMotorDistance(tickL);
+//   double distanceR = getMotorDistance(tickR);
+//   // printf("distanceL: %f\n", average(distanceL, distanceR));
+//   // printf("distanceR: %f\n", distanceR);
+//   return ((distanceL - distanceR) / (dm + dm));
+// }
 /* Local axis is offset from global axis by getHeading() / 2!!!*/
 void track(void* param) {
  double  globalX = 0;
@@ -414,6 +414,23 @@ void track(void* param) {
  }
 }
 
+void printTrackingValues() {
+  printf("Encoder right: %d\n", er);
+  printf("Distance right: %f\n", getDistance(er));
+  printf("Encoder left: %d\n", el);
+  printf("Distance left: %f\n", getDistance(el));
+  printf("Heading in degrees: %f\n", heading * (180 / M_PI));
+}
+
+void debug() {
+  printf("\n");
+  printf("Sensor values:\n");
+  printSensorValues();
+  printf("\n");
+  printf("Tracking values:\n");
+  printTrackingValues();
+}
+
 // double getDirection() {
 //   // Gets latest encoder values
 //   getEncoderValues();
@@ -432,7 +449,7 @@ void track(void* param) {
 //   }
 // }
 
-void turn (double targetHeading, int speed, bool slow = true) {
+void turn (double targetHeading, int speed = 127, bool slow = true) {
   double raja = 0.2;
   int minSpeed = 30;
   int nopeus;
@@ -441,8 +458,6 @@ void turn (double targetHeading, int speed, bool slow = true) {
 
   do {
     error = targetHeading - heading * (180 / M_PI);
-    // printf("Error: %f ", error);
-    // printf("Heading: %f\n", heading * (180 / M_PI));
 
     if(error > 0) constant = 20;
     else if(error < 0) constant = -20;
@@ -450,6 +465,10 @@ void turn (double targetHeading, int speed, bool slow = true) {
     nopeus = round(error * 1.3 + constant);
     if(nopeus < -127) nopeus = -127;
     else if(nopeus > 127) nopeus = 127;
+
+    printf("Error: %f ", error);
+    printf("Heading: %f ", heading * (180 / M_PI));
+    printf("Speed: %d\n", nopeus);
 
     if(fabs(error) > 900) break;
 
@@ -551,12 +570,13 @@ void forward(float targetDistance, int angle, int nopeus, float speedScale = 0.9
     do {
       currentDistance = average(getDistance(el), getDistance(er));
       error = targetDistance - currentDistance;
-      speed = error * 1.3;
+      speed = error * 10;
       if(speed < minSpeed && speed > 0) speed = minSpeed;
       else if(speed > -minSpeed && speed < 0) speed = -minSpeed;
       moveForward(speed);
       printf("Error: %f ", error);
-      printf("Current distance: %f\n", currentDistance);
+      printf("Current distance: %f  ", currentDistance);
+      printf("Speed: %f\n", speed);
       sleep(20);
     } while(fabs(error) > raja);
 
@@ -643,4 +663,13 @@ void backward(float targetDistance, int angle, int speed, float speedScale = 0.9
 
 }while (targetDistance >= currentDistance);
 stop();
+}
+
+
+void moveSideways(float aste, int speed = 127) {
+  double error = aste - heading * (180 / M_PI);
+  int nopeusR = speed;
+  int nopeusL = speed;
+  if(error > aste) nopeusR -= 5;
+  else if(error < aste) nopeusL -= 5;
 }

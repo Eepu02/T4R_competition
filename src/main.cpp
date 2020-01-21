@@ -57,8 +57,30 @@ void autonomous()
 
 	pros::Task my_cpp_task (track_task);
 
+	// while(1) {
+	// 	printSensorValues();
+	// 	sleep(20);
+	// }
 	startIntake();
-	forward(12, 0, 127);
+	forward(25, 0, 127);
+	forward(10, 0, 60);
+	forward(5, 0, 40);
+	sleep(500);
+	turn(-40);
+	stopIntake();
+	forward(-39, 0, 127);
+	turn(-20);
+
+	encoderBack.reset();
+	moveRight(127);
+	while(getDistance(eb) > -5) sleep(20);
+	turn(-20);
+
+	startIntake();
+	forward(25, 0, 60);
+	forward(-15, 0, 127);
+	stopIntake();
+	debug();
 	// turn(80.5, 127,true); //80.5 oikealle, systemaattinen virhe
 	// autoUnfold();
 	//
