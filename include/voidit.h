@@ -8,6 +8,9 @@ int defaultTraySpeed = 127;
 int defaultLiftSpeed = 127;
 int defaultCollectorSpeed = 127;
 
+// Minimum distance to be within target
+float distanceTreshold = 0.2;
+
 
 pros::Mutex mutex;
 
@@ -551,36 +554,31 @@ void PID(float target) {
 
   }
 }
-double gyroValue;
-//double error;
-float kuljettumatka;
-float currentDistance;
-float uusiArvo;
-float distanceTreshold = 0.2;
 
 void forward(float targetDistance, int angle, int nopeus, float speedScale = 0.97) {
-    resetEncoders();
-    getEncoderValues();
-    float lastDistance = 0;
-    int minSpeed = 30;
-    double speed;
-    float currentDistance = 0;
-    float error;
+  resetEncoders();
+  getEncoderValues();
+  float lastDistance = 0;
+  int minSpeed = 30;
+  double speed;
+  float currentDistance = 0;
+  float error;
 
-    do {
-      currentDistance = average(getDistance(el), getDistance(er));
-      error = targetDistance - currentDistance;
-      speed = error * 10;
-      if(speed < minSpeed && speed > 0) speed = minSpeed;
-      else if(speed > -minSpeed && speed < 0) speed = -minSpeed;
-      moveForward(speed);
-      printf("Error: %f ", error);
-      printf("Current distance: %f  ", currentDistance);
-      printf("Speed: %f\n", speed);
-      sleep(20);
-    } while(fabs(error) > distanceTreshold);
+  do {
+    currentDistance = average(getDistance(el), getDistance(er));
+    error = targetDistance - currentDistance;
+    speed = error * 10;
+    if(speed < minSpeed && speed > 0) speed = minSpeed;
+    else if(speed > -minSpeed && speed < 0) speed = -minSpeed;
+    moveForward(speed);
+    printf("Error: %f ", error);
+    printf("Current distance: %f  ", currentDistance);
+    printf("Speed: %f\n", speed);
+    sleep(20);
+  } while(fabs(error) > distanceTreshold);
 
-    stop();
+  stop();
+}
   //
   //   do {
   //     getEncoderValues();
@@ -617,7 +615,6 @@ void forward(float targetDistance, int angle, int nopeus, float speedScale = 0.9
   //
   // }while (targetDistance >= currentDistance);
   // stop();
-}
 // drives straight backward using cm
 
 // void backward(float targetDistance, int angle, int speed, float speedScale = 0.97) {
@@ -665,7 +662,7 @@ void forward(float targetDistance, int angle, int nopeus, float speedScale = 0.9
 // stop();
 // }
 
-
+// A low level function to keep the robot straight while moving sideways
 void lowLevelMoveSideways(float aste, int speed = 127) {
 
   // Compute speed adjustment to correct for invalid rotation
@@ -679,9 +676,9 @@ void lowLevelMoveSideways(float aste, int speed = 127) {
   LeftBackDrive.move(-speed + rotation);
 }
 
+// Moves the robot sideways while keeping it straight.
 void moveSideways(float distance, float aste, int speed) {
   float error;
-
   do {
     error = distance - getDistance(eb);
     speed = error * 10;
