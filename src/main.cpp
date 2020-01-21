@@ -71,9 +71,7 @@ void autonomous()
 	forward(-39, 0, 127);
 	turn(-20);
 
-	encoderBack.reset();
-	moveRight(127);
-	while(getDistance(eb) > -5) sleep(20);
+	moveSideways(-5, 0, 60);
 	turn(-20);
 
 	startIntake();
