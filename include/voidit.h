@@ -10,6 +10,7 @@ int defaultCollectorSpeed = 127;
 
 // Minimum distance to be within target
 float distanceTreshold = 0.2;
+float speedScale = 0.97;
 
 
 pros::Mutex mutex;
@@ -555,7 +556,7 @@ void PID(float target) {
   }
 }
 
-void forward(float targetDistance, int angle, int nopeus, float speedScale = 0.97) {
+void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = true) {
   resetEncoders();
   getEncoderValues();
   float lastDistance = 0;
@@ -568,8 +569,13 @@ void forward(float targetDistance, int angle, int nopeus, float speedScale = 0.9
     currentDistance = average(getDistance(el), getDistance(er));
     error = targetDistance - currentDistance;
     speed = error * 10;
-    if(speed < minSpeed && speed > 0) speed = minSpeed;
-    else if(speed > -minSpeed && speed < 0) speed = -minSpeed;
+    if(speed > nopeus) speed = nopeus;
+    else if(speed < -nopeus) speed = -nopeus;
+    if(deaccelerate) {
+      if(speed < minSpeed && speed > 0) speed = minSpeed;
+      else if(speed > -minSpeed && speed < 0) speed = -minSpeed;
+    }
+    else minSpeed = nopeus;
     moveForward(speed);
     printf("Error: %f ", error);
     printf("Current distance: %f  ", currentDistance);
@@ -670,10 +676,10 @@ void lowLevelMoveSideways(float aste, int speed = 127) {
   int rotation = error * 10;
 
   // Convert speed values to motor speeds
-  RightFrontDrive.move(-speed - rotation);
-  RightBackDrive.move(speed - rotation);
-  LeftFrontDrive.move(speed + rotation);
-  LeftBackDrive.move(-speed + rotation);
+  RightFrontDrive.move(speed - rotation);
+  RightBackDrive.move(-speed - rotation);
+  LeftFrontDrive.move(-speed + rotation);
+  LeftBackDrive.move(speed + rotation);
 }
 
 // Moves the robot sideways while keeping it straight.
