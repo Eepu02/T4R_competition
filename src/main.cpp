@@ -51,13 +51,13 @@ void competition_initialize() {
 void autonomous()
 {
 	// Create tracking task with a priority of 10 (default 8);
-	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
-								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
-	//autoUnfold();
+	// pros::Task track_task (track, (void*)"HELLO WORLD", 10,
+	// 							TASK_STACK_DEPTH_DEFAULT, "Tracking task");
+	// //autoUnfold();
+	//
+	// pros::Task my_cpp_task (track_task);
 
-	pros::Task my_cpp_task (track_task);
-
-	turn(-80.5, 127,true); //80.5 oikealle, systemaattinen virhe
+//	turn(-80.5, 127,true); //80.5 oikealle, systemaattinen virhe
 	// autoUnfold();
 	//
 	// startIntake();
@@ -106,14 +106,20 @@ void autonomous()
 
 void opcontrol() {
 
-	//resetEncoders();
+	resetEncoders();
 
-//	turn(90, 127);
-	//sesamOpen();
-	//read();
-	while(1)	{
-	 	// int potVal = PotRN.get_value();
-	 	// printf("nostin: %d\n", Nostin.get_encoder_units());
- 		tankD();
-	}
+	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
+								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
+	//autoUnfold();
+
+	pros::Task my_cpp_task (track_task);
+
+  backward(70, 0, 127);
+
+  // turn(90, 90, true);
+	//
+	// while(1)	{
+	//
+ 	// 	tankD();
+	// }
 }
