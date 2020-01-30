@@ -470,6 +470,11 @@ void turn (double targetHeading, int speed = 127, bool slow = true) {
     if(nopeus < -127) nopeus = -127;
     else if(nopeus > 127) nopeus = 127;
 
+    if(slow) {
+      if(nopeus < minSpeed && nopeus > 0) nopeus = minSpeed;
+      else if(nopeus > -minSpeed && nopeus < 0) nopeus = -minSpeed;
+    }
+
     printf("Error: %f ", error);
     printf("Heading: %f ", heading * (180 / M_PI));
     printf("Speed: %d\n", nopeus);

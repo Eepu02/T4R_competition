@@ -11,6 +11,14 @@ void initialize() {
 	//pros::lcd::initialize();
 	//pros::lcd::print(0, "%d\n", encoderBack.get_value());
 	setup();
+	resetEncoders();
+
+	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
+								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
+	//autoUnfold();
+
+	pros::Task my_cpp_task (track_task);
+
 
 }
 
@@ -62,26 +70,35 @@ void autonomous()
 	// 	sleep(20);
 	// }
 	startIntake();
-	sleep(400);
-	forward(25, 0, 127);
-	forward(10, 0, 60);
-	forward(5, 0, 40);
-	sleep(500);
+	sleep(300);
+	forward(20, 0, 127);
+	forward(15, 0, 100);
+
+	// forward(5, 0, 40);
+	// sleep(500);
 	turn(-40);
-	stopIntake();
-	forward(-39, 0, 127, false);
+	// stopIntake();
+	forward(-37, 0, 127);
+	setRightSpeed(-127);
+	sleep(250);
+	setLeftSpeed(80);
+	sleep(150);
 
-	movedBackward(127);
-	sleep(750);
-	stop();
-
-	// turn(-20);
+	forward(40, 0, 90);
 	// moveSideways(-5, 0, 60);
 	// turn(-20);
+	//
+	// movedBackward(127);
+	// sleep(1100);
+	// setLeftSpeed(0);
+	// sleep(500);
+  stop();
+	// turn(-20);
+	// turn(-20);
 
-	startIntake();
-	forward(45, 5, 50);
-	forward(-15, 5, 127);
+	// startIntake();
+	// forward(45, 5, 50);
+	// forward(-15, 5, 127);
 	stopIntake();
 	debug();
 	// turn(80.5, 127,true); //80.5 oikealle, systemaattinen virhe
@@ -133,15 +150,10 @@ void autonomous()
 
 void opcontrol() {
 
-	resetEncoders();
+while(1) {
+	tankD();
+}
 
-	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
-								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
-	//autoUnfold();
-
-	pros::Task my_cpp_task (track_task);
-
-  backward(70, 0, 127);
 
   // turn(90, 90, true);
 	//
