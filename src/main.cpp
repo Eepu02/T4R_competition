@@ -69,25 +69,35 @@ void autonomous()
 	// 	printSensorValues();
 	// 	sleep(20);
 	// }
+	// turn(90);
+	// debug();
+	// while(1) sleep(100);
 	startIntake();
-	sleep(300);
+	sleep(250);
 	forward(20, 0, 127);
-	forward(15, 0, 100);
+	forward(15.1, 0, 100);
 
 	// forward(5, 0, 40);
 	// sleep(500);
 	turn(-40);
 	// stopIntake();
-	forward(-37, 0, 127);
+	forward(-36.5, 0, 127);
 	setRightSpeed(-127);
 	sleep(250);
 	setLeftSpeed(80);
-	sleep(150);
+	sleep(200);
 
-	forward(40, 0, 90);
+	forward(15, 0, 79);
+	// pros::lcd::set_text(0, "Gyro now: %f", heading)
+	setRightSpeed(90);
+	setLeftSpeed(60);
+	sleep(100);
+	forward(27, 0, 65);
+	// turnLeft(80);
+	// sleep(300);
+	forward(3, 0, 60);
 	// moveSideways(-5, 0, 60);
 	// turn(-20);
-	//
 	// movedBackward(127);
 	// sleep(1100);
 	// setLeftSpeed(0);

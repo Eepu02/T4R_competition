@@ -40,13 +40,13 @@ void resetDriveMotors ()
 }
 
 void setup() {
-   CollectorLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-   KerainOikea.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-   Lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-   RampLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-   resetDriveMotors();
-   resetEncoders();
-
+  CollectorLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  KerainOikea.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  Lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  RampLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  resetDriveMotors();
+  resetEncoders();
+  pros::lcd::initialize();
 }
 
 // sensor debugging function
@@ -273,7 +273,7 @@ void getEncoderValues() {
   lastEb     = eb;
 }
 
-double getDistance(int degrees, float d = 3.25) {
+double getDistance(int degrees, float d = 3.38) { //3.25
   return M_PI * d * (double(degrees) / 360);
 }
 
@@ -455,7 +455,7 @@ void debug() {
 
 void turn (double targetHeading, int speed = 127, bool slow = true) {
   double raja = 0.2;
-  int minSpeed = 30;
+  int minSpeed = 29;
   int nopeus;
   int constant;
   double error = targetHeading - heading * (180 / M_PI);
