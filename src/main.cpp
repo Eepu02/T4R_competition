@@ -162,6 +162,7 @@ void opcontrol() {
 
 while(1) {
 	tankD();
+	// printf("Global heading: %f\n", heading * (180 / M_PI));
 }
 
 

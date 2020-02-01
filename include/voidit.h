@@ -273,7 +273,7 @@ void getEncoderValues() {
   lastEb     = eb;
 }
 
-double getDistance(int degrees, float d = 3.38) { //3.25
+double getDistance(int degrees, float d = 3.5) { //3.25
   return M_PI * d * (double(degrees) / 360);
 }
 
@@ -455,7 +455,7 @@ void debug() {
 
 void turn (double targetHeading, int speed = 127, bool slow = true) {
   double raja = 0.2;
-  int minSpeed = 29;
+  int minSpeed = 15;
   int nopeus;
   int constant;
   double error = targetHeading - heading * (180 / M_PI);
@@ -463,10 +463,10 @@ void turn (double targetHeading, int speed = 127, bool slow = true) {
   do {
     error = targetHeading - heading * (180 / M_PI);
 
-    if(error > 0) constant = 20;
-    else if(error < 0) constant = -20;
+    if(error > 0) constant = 15;
+    else if(error < 0) constant = -15;
     else constant = 0;
-    nopeus = round(error * 1.3 + constant);
+    nopeus = round(error * 1.35 + constant);
     if(nopeus < -127) nopeus = -127;
     else if(nopeus > 127) nopeus = 127;
 
@@ -485,7 +485,6 @@ void turn (double targetHeading, int speed = 127, bool slow = true) {
     sleep(20);
   } while(fabs(error) > raja);
 
-  printf("failed");
   stop();
 
   // if (targetHeading < error) {
