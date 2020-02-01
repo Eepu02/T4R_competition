@@ -75,13 +75,13 @@ void autonomous()
 	startIntake();
 	sleep(250);
 	forward(20, 0, 127);
-	forward(15.1, 0, 100);
+	forward(15.3, 0, 100);
 
 	// forward(5, 0, 40);
 	// sleep(500);
-	turn(-40);
+	turn(-42.6	);
 	// stopIntake();
-	forward(-36.5, 0, 127);
+	forward(-37.2, 0, 127);
 	setRightSpeed(-127);
 	sleep(250);
 	setLeftSpeed(80);
@@ -89,13 +89,22 @@ void autonomous()
 
 	forward(15, 0, 79);
 	// pros::lcd::set_text(0, "Gyro now: %f", heading)
-	setRightSpeed(90);
-	setLeftSpeed(60);
+	setRightSpeed(95);
+	setLeftSpeed(50);
 	sleep(100);
 	forward(27, 0, 65);
 	// turnLeft(80);
 	// sleep(300);
-	forward(3, 0, 60);
+	forward(3.1, 0, 70);
+
+	turn(-30);
+
+	// forward(-30, 0, 127);
+	// turn(83.5);
+
+	// forward(20, 0, 90);
+
+
 	// moveSideways(-5, 0, 60);
 	// turn(-20);
 	// movedBackward(127);
@@ -160,9 +169,16 @@ void autonomous()
 
 void opcontrol() {
 
-while(1) {
-	tankD();
-}
+
+debug();
+
+turn(90);
+
+debug();
+
+// while(1) {
+	// tankD();
+// }
 
 
   // turn(90, 90, true);
