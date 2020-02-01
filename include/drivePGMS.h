@@ -19,13 +19,8 @@ bool SecConDrivSide = false;
 
 // rampin nostimen muuttujat
 int rnSpeed;
-int maxVal = 3410; //max valur of RN
 int hidVal = 2360;
 int alVal = 1050;
-
-int CoS()  {
-  return round((maxVal - PotRN.get_value()) * 0.091);
-}
 
 
 //nostimen muuttujat
@@ -85,7 +80,7 @@ void tankD()  {
     // kerääjän liike
     // collector movement
 
-    if (PotRN.get_value() > hidVal) rnSpeed = CoS();
+    if (PotRN.get_value() > hidVal) rnSpeed = CoS(PotRN.get_value());
     else rnSpeed = 127;
 
     if (firConCollector && Controller1.get_digital(DIGITAL_R1)) startIntake(rnSpeed);
@@ -107,7 +102,7 @@ void tankD()  {
 
     // rampin nostimen liike
 
-    if(PotRN.get_value() > hidVal)  rnSpeed = CoS();
+    if(PotRN.get_value() > hidVal)  rnSpeed = CoS(PotRN.get_value());
     else rnSpeed = 127;
 
     if(firConRN && Controller1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
@@ -202,7 +197,7 @@ void arcadeDrive() {
 
       // rampin nostimen liike
 
-      if(PotRN.get_value() > hidVal)  rnSpeed = CoS();
+      if(PotRN.get_value() > hidVal)  rnSpeed = CoS(PotRN.get_value());
       else rnSpeed = 127;
 
       if(firConRN && Controller1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);

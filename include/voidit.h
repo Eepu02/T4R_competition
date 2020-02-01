@@ -11,7 +11,7 @@ int defaultCollectorSpeed = 127;
 // Minimum distance to be within target
 float distanceTreshold = 0.2;
 float speedScale = 0.97;
-
+int maxVal = 3400; //max valur of RN
 
 pros::Mutex mutex;
 
@@ -193,6 +193,10 @@ void stopTray() {
   moveTray(3);
 }
 
+int CoS(int pot)  {
+  return round((maxVal - pot) * 0.091);
+}
+
 /* Function to unfold the robot automatically on match start */
 void autoUnfold() {
 
@@ -273,17 +277,23 @@ void getEncoderValues() {
   lastEb     = eb;
 }
 
+double lastDist = 0;
+
 double getDistance(int degrees, float d = 3.5) { //3.25
   return M_PI * d * (double(degrees) / 360);
 }
-
 // Computes the change in orientation since last oriantation
 double getHeading() {
   // Degress
   //return (-180 * (getDistance(DEl) - getDistance(DEr))) / ((dl - dr) * M_PI);
 
   //Radians
-  return (getDistance(DEl) - getDistance(DEr)) / (dr + dl);
+  double currentVal = (getDistance(el) - getDistance(er)) / (dr + dl);
+  if(fabs(currentVal - lastSuunta) < 1) {
+    lastSuunta = currentVal;
+    return currentVal;
+  }
+  else return lastSuunta;
 }
 
 // double getMotorDistance(double ticks, float d = 4.071) {
@@ -317,23 +327,23 @@ void track(void* param) {
 
    // Gets latest encoder values
    getEncoderValues();
-
+   heading = getHeading();
    // Compute change in orientation
-   deltaHeading = getHeading();
-   // heading = getMotorHeading();
-   // printf("Kulma: %f\n", heading * (180 / M_PI));
-
-   if(fabs(deltaHeading) < 1) {
-
-     // The new orientation is the previous orientation plus the change
-     mutex.take(5);
-     heading += deltaHeading;
-
-     // printf("Kulma: %f\n", heading * (180 / M_PI));
-     mutex.give();
-
-     lastHeading = deltaHeading;
-   }
+   // deltaHeading = getHeading();
+   // // heading = getMotorHeading();
+   // // printf("Kulma: %f\n", heading * (180 / M_PI));
+   //
+   // if(fabs(deltaHeading) < 1) {
+   //
+   //   // The new orientation is the previous orientation plus the change
+   //   mutex.take(5);
+   //   heading += deltaHeading;
+   //
+   //   // printf("Kulma: %f\n", heading * (180 / M_PI));
+   //   mutex.give();
+   //
+   //   lastHeading = deltaHeading;
+   // }
 
    // double theta = (-180*())
 
@@ -454,19 +464,21 @@ void debug() {
 // }
 
 void turn (double targetHeading, int speed = 127, bool slow = true) {
-  double raja = 0.2;
-  int minSpeed = 15;
+  double raja = 0.3;
+  int minSpeed = 16;
   int nopeus;
   int constant;
+  int increment = 0;
   double error = targetHeading - heading * (180 / M_PI);
+  double lastError = error;
 
   do {
     error = targetHeading - heading * (180 / M_PI);
 
-    if(error > 0) constant = 15;
-    else if(error < 0) constant = -15;
+    if(error > 0) constant = 16;
+    else if(error < 0) constant = -16;
     else constant = 0;
-    nopeus = round(error * 1.35 + constant);
+    nopeus = round(error * 1.4 + constant);
     if(nopeus < -127) nopeus = -127;
     else if(nopeus > 127) nopeus = 127;
 
@@ -482,6 +494,16 @@ void turn (double targetHeading, int speed = 127, bool slow = true) {
     if(fabs(error) > 900) break;
 
     turnRight(nopeus);
+
+    increment++;
+    if(increment > 7 && lastError == error) {
+      printf("Exiting for slow turn");
+      break;
+    }
+    else if(increment > 7) {
+      lastError = error;
+      increment = 0;
+    }
     sleep(20);
   } while(fabs(error) > raja);
 
@@ -568,6 +590,7 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
   double speed;
   float currentDistance = 0;
   float error;
+  float lastError;
 
   do {
     currentDistance = average(getDistance(el), getDistance(er));
@@ -583,7 +606,11 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
     moveForward(speed);
     printf("Error: %f ", error);
     printf("Current distance: %f  ", currentDistance);
-    printf("Speed: %f\n", speed);
+    printf("Speed: %f ", speed);
+    printf("Encoder left: %d  ", el);
+    printf("Encoder right: %d ", er);
+    printf("Heading (deg): %f\n", heading * (180 / M_PI));
+
     sleep(20);
   } while(fabs(error) > distanceTreshold);
 
@@ -695,4 +722,23 @@ void moveSideways(float distance, float aste, int speed) {
     lowLevelMoveSideways(aste, speed);
     sleep(20);
   } while(fabs(error) > distanceTreshold);
+}
+
+void stack() {
+  reverseIntake(65);
+  sleep(465);
+  stopIntake();
+  printf("Entering lift");
+  do {
+    raiseTray(CoS(PotRN.get_value()));
+    sleep(20);
+  } while(PotRN.get_value() < 3200); //1060
+  stopTray();
+  printf("Lift successful");
+  // moveForward(60);
+  reverseIntake(127);
+  moveForward(85);
+  sleep(400);
+  movedBackward(90);
+  sleep(500);
 }

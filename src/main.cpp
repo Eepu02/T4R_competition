@@ -74,35 +74,70 @@ void autonomous()
 	// while(1) sleep(100);
 	startIntake();
 	sleep(250);
+	KerainOikea.move(-127);
+	CollectorLeft.move(0);
+	sleep(100);
+	startIntake();
 	forward(20, 0, 127);
 	forward(15.3, 0, 100);
+	// KerainOikea.move(-127);
+	// CollectorLeft.move(0);
+	// sleep(100);
+	// startIntake();
 
 	// forward(5, 0, 40);
 	// sleep(500);
-	turn(-42.6	);
+	debug();
+	printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
+	turn(-42.8);
 	// stopIntake();
-	forward(-37.2, 0, 127);
+	movedBackward(127);
+	sleep(1000);
+	stop();
+	// forward(-37.2, 0, 127);
 	setRightSpeed(-127);
-	sleep(250);
+	sleep(175);
 	setLeftSpeed(80);
-	sleep(200);
+	sleep(188);
 
-	forward(15, 0, 79);
+	forward(13, 0, 79);
 	// pros::lcd::set_text(0, "Gyro now: %f", heading)
-	setRightSpeed(95);
-	setLeftSpeed(50);
-	sleep(100);
-	forward(27, 0, 65);
+	setLeftSpeed(127);
+	setRightSpeed(40);
+	sleep(150);
+	forward(22.5, 0, 45);
+	// KerainOikea.move(-110);
+	// setRightSpeed(40);
+	// sleep(200);
+	// startIntake();
+	moveForward(45);
+	sleep(300);
+	stop();
+	// forward(2, 0, 45);
 	// turnLeft(80);
 	// sleep(300);
-	forward(3.1, 0, 70);
+	// forward(3.1, 0, 70);
+	//
+	// turn(-30);
 
-	turn(-30);
+	printf("Repositioning");
+	forward(-22.6, 0, 127);
+	resetEncoders();
+	debug();
+	printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
+	turn(125);
+	debug();
+	printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
 
-	// forward(-30, 0, 127);
-	// turn(83.5);
-
-	// forward(20, 0, 90);
+	printf("Moving to stack position");
+	setLeftSpeed(80);
+	setRightSpeed(110);
+	raiseTray(CoS(PotRN.get_value()));
+	sleep(750);
+	stop();
+	printf("Beginnig stack");
+	// forward(14, 0, 90);
+	stack();
 
 
 	// moveSideways(-5, 0, 60);
@@ -168,7 +203,8 @@ void autonomous()
 // }
 
 void opcontrol() {
-
+// turn(90, 60);
+// debug();
 while(1) {
 	tankD();
 	// printf("Global heading: %f\n", heading * (180 / M_PI));
