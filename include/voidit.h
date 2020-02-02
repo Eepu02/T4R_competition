@@ -197,6 +197,10 @@ int CoS(int pot)  {
   return round((maxVal - pot) * 0.091);
 }
 
+int aggCoS(int pot) {
+  return round((maxVal - pot) * 0.15);
+}
+
 /* Function to unfold the robot automatically on match start */
 void autoUnfold() {
 
@@ -206,14 +210,21 @@ void autoUnfold() {
   Lift.tare_position();
   RampLift.tare_position();
 
+  // reverseIntake();
+
   // Fold out intakes
   do {
     raiseTray();
-  } while(PotRN.get_value() < 3900); //1060
-  reverseIntake(70);
-  sleep(3000);
-  stopIntake();
+    // if(PotRN.get_value() > 1000) reverseIntake();
+    sleep(20);
+  } while(PotRN.get_value() < 1600); //1060
 
+  lowerTray();
+  raiseLift();
+  startIntake();
+
+  sleep(500);
+  Lift.move_absolute(10, 127);
   RampLift.move_absolute(30, 127);
 
   /*while(!C1.get_digital(DIGITAL_X)) sleep(20);
@@ -478,7 +489,7 @@ void turn (double targetHeading, int speed = 127, bool slow = true) {
     if(error > 0) constant = 16;
     else if(error < 0) constant = -16;
     else constant = 0;
-    nopeus = round(error * 1.4 + constant);
+    nopeus = round(error * 1.5 + constant);
     if(nopeus < -127) nopeus = -127;
     else if(nopeus > 127) nopeus = 127;
 
@@ -739,30 +750,30 @@ void moveSideways(float distance, float aste, int speed) {
 void stack() {
   setLeftSpeed(110);
   setRightSpeed(110);
-  stopIntake();
-  raiseTray(CoS(PotRN.get_value()));
-  sleep(500);
-  reverseIntake(70);
-  sleep(250);
+  reverseIntake(35);
+  // stopIntake();
+  // raiseTray(aggCoS(PotRN.get_value()));
+  sleep(600);
+  raiseTray(aggCoS(PotRN.get_value()));
+  sleep(140);
   stop();
-  printf("Beginnig stack");
-  sleep(465);
+  sleep(450);
   stopIntake();
-  printf("Entering lift");
+
+  // Raise tray
   do {
-    raiseTray(CoS(PotRN.get_value()));
+    raiseTray(aggCoS(PotRN.get_value()));
     sleep(20);
-  } while(PotRN.get_value() < 3200); //1060
+  } while(PotRN.get_value() < 3250); //1060
   stopTray();
-  printf("Lift successful");
-  // moveForward(60);
+
   reverseIntake(127);
-  sleep(80);
+  sleep(150);
   moveForward(75);
   sleep(50);
   movedBackward(100);
   lowerTray();
-  sleep(500);
+  sleep(300);
   stopTray();
   stopIntake();
 }

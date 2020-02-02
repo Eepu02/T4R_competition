@@ -57,7 +57,9 @@ void competition_initialize() {
 
 void autonomous()
 {
-	red2();
+	//autoUnfold();
+	// red2();
+	red1();
 }
 /**
  * Runs the operator control code. This function will be started in its own task
