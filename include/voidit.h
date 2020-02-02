@@ -464,7 +464,7 @@ void debug() {
 // }
 
 void turn (double targetHeading, int speed = 127, bool slow = true) {
-  double raja = 0.3;
+  double raja = 0.2;
   int minSpeed = 16;
   int nopeus;
   int constant;
@@ -497,7 +497,7 @@ void turn (double targetHeading, int speed = 127, bool slow = true) {
 
     increment++;
     if(increment > 7 && lastError == error) {
-      printf("Exiting for slow turn");
+      printf("Exiting for slow turn\n");
       break;
     }
     else if(increment > 7) {
@@ -590,7 +590,8 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
   double speed;
   float currentDistance = 0;
   float error;
-  float lastError;
+  int increment = 0;
+  float lastError = error;
 
   do {
     currentDistance = average(getDistance(el), getDistance(er));
@@ -610,6 +611,17 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
     printf("Encoder left: %d  ", el);
     printf("Encoder right: %d ", er);
     printf("Heading (deg): %f\n", heading * (180 / M_PI));
+
+
+    increment++;
+    if(increment > 7 && lastError == error) {
+      printf("Exiting for slow movement\n");
+      break;
+    }
+    else if(increment > 7) {
+      lastError = error;
+      increment = 0;
+    }
 
     sleep(20);
   } while(fabs(error) > distanceTreshold);
@@ -725,7 +737,7 @@ void moveSideways(float distance, float aste, int speed) {
 }
 
 void stack() {
-  reverseIntake(65);
+  reverseIntake(60);
   sleep(465);
   stopIntake();
   printf("Entering lift");
@@ -737,8 +749,12 @@ void stack() {
   printf("Lift successful");
   // moveForward(60);
   reverseIntake(127);
-  moveForward(85);
-  sleep(400);
-  movedBackward(90);
+  sleep(80);
+  moveForward(75);
+  sleep(50);
+  movedBackward(100);
+  lowerTray();
   sleep(500);
+  stopTray();
+  stopIntake();
 }
