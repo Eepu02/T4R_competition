@@ -85,9 +85,9 @@ void red1() {
   movedBackward(127);
   sleep(100);
   stop();
-  turn(-90);
+  // turn(-90);
 
-  forward(20, -90, 100);
+  // forward(20, -90, 100);
 
 }
 

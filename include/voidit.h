@@ -202,42 +202,6 @@ int aggCoS(int pot) {
 }
 
 /* Function to unfold the robot automatically on match start */
-void autoUnfold() {
-
-  // setup
-  Lift.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-  RampLift.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-  Lift.tare_position();
-  RampLift.tare_position();
-
-  // reverseIntake();
-
-  // Fold out intakes
-  do {
-    raiseTray();
-    // if(PotRN.get_value() > 1000) reverseIntake();
-    sleep(20);
-  } while(PotRN.get_value() < 1600); //1060
-
-  lowerTray();
-  raiseLift();
-  startIntake();
-
-  sleep(500);
-  Lift.move_absolute(10, 127);
-  RampLift.move_absolute(30, 127);
-
-  /*while(!C1.get_digital(DIGITAL_X)) sleep(20);
-  // Fold out tray
-  RampLift.move_absolute(0, 127);
-  raiseLift();
-  while(Lift.get_position() < 1300) sleep(20);
-
-  // Reset lift
-  Lift.move_absolute(0, 127);
-  sleep(5000);*/
-
-}
 
 // Tracking wheels' distance to tracking center
 // Values from CAD model
