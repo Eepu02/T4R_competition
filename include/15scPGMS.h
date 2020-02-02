@@ -48,13 +48,6 @@ void blue2() {
     // kääntynyt kohti stac aluetta
 
   	printf("Moving to stack position");
-  	setRightSpeed(110);
-  	setLeftSpeed(110);
-    stopIntake();
-  	raiseTray(CoS(PotRN.get_value()));
-  	sleep(750);
-  	stop();
-  	printf("Beginnig stack"); // olemme stack positionissa
 
   	stack(); // stackkaus
     stop();
@@ -84,9 +77,9 @@ void red2() {
 
 	startIntake();
 	sleep(250);
-	KerainOikea.move(-127);
-	CollectorLeft.move(0);
-	sleep(150);
+	// KerainOikea.move(-127);
+	// CollectorLeft.move(0);
+	// sleep(50);
 	startIntake();
 	forward(20, 0, 127);
 	forward(15.3, 0, 100);
@@ -127,13 +120,6 @@ void red2() {
 	printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
 
 	printf("Moving to stack position");
-	setLeftSpeed(110);
-	setRightSpeed(110);
-  stopIntake();
-	raiseTray(CoS(PotRN.get_value()));
-	sleep(750);
-	stop();
-	printf("Beginnig stack");
 
 	stack();
 

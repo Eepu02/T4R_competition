@@ -614,11 +614,11 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
 
 
     increment++;
-    if(increment > 7 && lastError == error) {
+    if(increment > 3 && lastError == error) {
       printf("Exiting for slow movement\n");
       break;
     }
-    else if(increment > 7) {
+    else if(increment > 3) {
       lastError = error;
       increment = 0;
     }
@@ -737,7 +737,15 @@ void moveSideways(float distance, float aste, int speed) {
 }
 
 void stack() {
-  reverseIntake(60);
+  setLeftSpeed(110);
+  setRightSpeed(110);
+  stopIntake();
+  raiseTray(CoS(PotRN.get_value()));
+  sleep(500);
+  reverseIntake(70);
+  sleep(250);
+  stop();
+  printf("Beginnig stack");
   sleep(465);
   stopIntake();
   printf("Entering lift");
