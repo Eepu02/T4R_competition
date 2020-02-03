@@ -9,7 +9,7 @@ pros::Motor RightBackDrive(20, true);
 pros::Motor KerainOikea(7, MOTOR_GEARSET_18, false);
 pros::Motor RightFrontDrive(10, true);
 pros::Motor Lift(19, MOTOR_GEARSET_36, true);
-pros::Motor RampLift(13, MOTOR_GEARSET_36);
+pros::Motor RampLift(17, MOTOR_GEARSET_36);
 
 pros::ADIEncoder encoderBack(1, 2);
 pros::ADIEncoder encoderLeft(3, 4);

@@ -589,11 +589,11 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
 
 
     increment++;
-    if(increment > 3 && lastError == error) {
+    if(increment > 7 && lastError == error) {
       printf("Exiting for slow movement\n");
       break;
     }
-    else if(increment > 3) {
+    else if(increment > 7) {
       lastError = error;
       increment = 0;
     }
