@@ -93,16 +93,7 @@ void red1() {
 
 void red2() {
 
-  moveTray(1);
-
-	startIntake();
-	sleep(150);
-  stopTray();
-  RampLift.move_absolute(11,100);
-	// KerainOikea.move(-127);
-	// CollectorLeft.move(0);
-	// sleep(50);
-	startIntake();
+  startIntake();
 	forward(20, 0, 127);
 	forward(15.3, 0, 100);
 
@@ -145,7 +136,7 @@ void red2() {
 	debug();
 }
 
-void skilsPGM (){
+void skillsPGM() {
   startIntake();
   sleep(150);
   KerainOikea.move(-127);
@@ -175,20 +166,19 @@ void skilsPGM (){
   sleep(300);
   stop(); //neljä kuutiota on kerätty
 
-  printf("Repositioning");
-  forward(-22.6, 0, 127);
-  resetEncoders();
+  // printf("Repositioning");
+  // forward(-22.6, 0, 127);
+  // resetEncoders();
+  // debug();
+  // printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
+  // turn(-125);
+  // debug();
+  // printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
+  // // kääntynyt kohti stac aluetta
+  //
+  // printf("Moving to stack position");
+  //
+  // stack(); // stackkaus
+  // stop();
   debug();
-  printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
-  turn(-125);
-  debug();
-  printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
-  // kääntynyt kohti stac aluetta
-
-  printf("Moving to stack position");
-
-  stack(); // stackkaus
-  stop();
-  debug();
-
 }

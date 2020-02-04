@@ -18,6 +18,7 @@ void initialize() {
 
 	pros::Task my_cpp_task (track_task);
 
+	// pros::Task skills_task (skillsPGM, (void*)"HELLO WORLD", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Skills auto");
 
 }
 
@@ -59,9 +60,7 @@ void autonomous()
 {
 	//autoUnfold();
 	// red2();
-//	red1();
-
-
+	red2();
 }
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -86,23 +85,11 @@ void autonomous()
 // }
 
 void opcontrol() {
-
-	RampLift.move(127);
-	sleep(1000);
-	stopTray();
-	RampLift.move(-127);
-	sleep(1000);
-	RampLift.move(127);
-	startIntake();
-	sleep(1200);
-	stopTray();
-	RampLift.move_absolute(11,127);
-	forward(10,0,127);
-
-
-// turn(90, 60);
-// debug();
+// pros::Task my_cpp_task2 (skills_task);
+// while(!Controller1.get_digital(DIGITAL_X)) sleep(20);
+// my_cpp_task2().remove();
+// skillsPGM();
 while(1) {
-tankD();
+	tankD();
 }
 }
