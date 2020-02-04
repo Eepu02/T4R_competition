@@ -575,6 +575,16 @@ void moveSideways(float distance, float aste, int speed) {
   } while(fabs(error) > distanceTreshold);
 }
 
+void autoUnfold() {
+  raiseTray();
+  sleep(1300);
+  reverseIntake();
+  stopTray();
+  sleep(1000);
+  stopIntake();
+  RampLift.move_absolute(150, 127);
+}
+
 void stack() {
   setLeftSpeed(110);
   setRightSpeed(110);

@@ -93,17 +93,7 @@ void red1() {
 
 void red2() {
 
-  // RampLift.move_absolute(2000, 127);
-  raiseTray();
-
-	startIntake();
-  sleep(1200);
-  // do {
-  //   sleep(20);
-  // }
-	// while(!RampLift.is_stopped());
-  RampLift.move_absolute(50, 127);
-  sleep(500);
+  startIntake();
 	forward(20, 0, 127);
 	forward(15.3, 0, 100);
 
