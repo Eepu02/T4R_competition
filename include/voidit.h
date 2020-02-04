@@ -420,24 +420,6 @@ void debug() {
   printTrackingValues();
 }
 
-// double getDirection() {
-//   // Gets latest encoder values
-//   getEncoderValues();
-//
-//   // Compute change in orientation
-//   deltaHeading = getHeading();
-//
-//   // The new orientation is the previous orientation plus the change
-//   return heading += deltaHeading * (180 / M_PI);
-// }
-
-// void read() {
-//   while(1) {
-//     printf("Heading toisessa paikassa: %f\n", *ptr);
-//     sleep(100);
-//   }
-// }
-
 void turn (double targetHeading, int speed = 127, bool slow = true) {
   double raja = 0.2;
   int minSpeed = 16;
@@ -483,42 +465,6 @@ void turn (double targetHeading, int speed = 127, bool slow = true) {
   } while(fabs(error) > raja);
 
   stop();
-
-  // if (targetHeading < error) {
-  //   do {
-  //   mutex.take(20);
-  //    error = heading * (180 / M_PI) - targetHeading;
-  //    mutex.give();
-  //    if (slow) {
-  //      if(fabs(error) < double(speed)) {
-  //        speed = round(fabs(error)) * 6;
-  //        if(speed < minSpeed) speed = minSpeed;
-  //      }
-  //    }
-  //    turnLeft(speed);
-  //    sleep(20);
-  //   }
-  //   while (fabs(error) > raja);
-  //   stop();
-  // }
-  // if (targetHeading > error) {
-  //   do {
-  //     error = heading * (180 / M_PI) - targetHeading;
-  //     // printf("Error: %f\n", error);
-  //     if (slow) {
-  //       if(fabs(error) < double(speed)) {
-  //         speed = round(fabs(error));
-  //         if(speed < minSpeed) speed = minSpeed;
-  //       }
-  //     }
-  //     printf("speed: %d\n", speed);
-  //     turnRight(speed);
-  //     sleep(20);
-  //   }
-  //   while (fabs(error) > raja);
-  //   stop();
-  //   printf("Error: %f\n", error);
-  // }
 }
 
 void PID(float target) {
@@ -603,88 +549,6 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
 
   stop();
 }
-  //
-  //   do {
-  //     getEncoderValues();
-  //
-  //     currentDistance = average(getDistance(el), getDistance(er));
-  //      gyroValue = heading;
-  //      error = angle - gyroValue;
-  //      if (currentDistance < targetDistance) sleep(10);
-  //      else if (currentDistance > targetDistance) currentDistance = currentDistance - alkuarvo;
-  //       moveForward(speed);
-  //
-  //     if (error > 0)
-  //     {
-  //         setLeftSpeed(speed);
-  //         setRightSpeed(speed * speedScale);
-  //     }
-  //     else if (error < 0)
-  //     {
-  //         setLeftSpeed(speed * speedScale);
-  //         setRightSpeed(speed);
-  //      }
-  //   else moveForward(speed);
-  //
-  //    double error = targetDistance - currentDistance;
-  //
-  //    if (error < 5) {
-  //      if (error * 10 < speed) speed = error * 10;
-  //    }
-  //
-  //    sleep(30);
-  //
-  //    printf("currentDistance: %f\n", currentDistance);
-  //    printf("uusiArvo: %f\n", uusiArvo);
-  //
-  // }while (targetDistance >= currentDistance);
-  // stop();
-// drives straight backward using cm
-
-// void backward(float targetDistance, int angle, int speed, float speedScale = 0.97) {
-//   float error;
-//   resetEncoders();
-//   sleep(100);
-//   getEncoderValues();
-//   float alkuarvo = average(getDistance(el), getDistance(er));;
-//   printf("alkuarvo: %f\n", currentDistance);
-//
-//   do {
-//     getEncoderValues();
-//
-//     currentDistance = average(getDistance(el), getDistance(er));
-//      gyroValue = heading;
-//      error = angle - gyroValue;
-//      if (currentDistance < targetDistance) sleep(10);
-//      else if (currentDistance > targetDistance) currentDistance = currentDistance - alkuarvo;
-//       movedBackward(-speed);
-//
-//     if (error > 0)
-//     {
-//         setLeftSpeed(-speed);
-//         setRightSpeed(-speed * speedScale);
-//     }
-//     else if (error < 0)
-//     {
-//         setLeftSpeed(-speed * speedScale);
-//         setRightSpeed(-speed);
-//      }
-//   else movedBackward(-speed);
-//
-//    double error = targetDistance - currentDistance;
-//
-//    if (error < 5) {
-//      if (error * -10 < speed) speed = error * -10;
-//    }
-//
-//    sleep(30);
-//
-//    printf("currentDistance: %f\n", currentDistance);
-//    printf("uusiArvo: %f\n", uusiArvo);
-//
-// }while (targetDistance >= currentDistance);
-// stop();
-// }
 
 // A low level function to keep the robot straight while moving sideways
 void lowLevelMoveSideways(float aste, int speed = 127) {
