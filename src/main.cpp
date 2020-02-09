@@ -59,8 +59,10 @@ void competition_initialize() {
 void autonomous()
 {
 	//autoUnfold();
-	// red2();
-	red2();
+	 // red2();
+	// skillsPGM();
+	realPGM();
+
 }
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -85,11 +87,13 @@ void autonomous()
 // }
 
 void opcontrol() {
+
+	while(1) {
+		tankD();
+	}
 // pros::Task my_cpp_task2 (skills_task);
 // while(!Controller1.get_digital(DIGITAL_X)) sleep(20);
 // my_cpp_task2().remove();
 // skillsPGM();
-while(1) {
-	tankD();
-}
+// skillsDrive();
 }

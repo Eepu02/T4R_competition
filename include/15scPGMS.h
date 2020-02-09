@@ -93,27 +93,28 @@ void red1() {
 
 void red2() {
 
+
+	// forward(20, 0, 127);
+	// forward(15.3, 0, 100);
+  //
+	// debug();
+	// printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
+	// turn(-42.6);
+	// movedBackward(127);
+	// sleep(900);
+	// stop();
+	// forward(-37.2, 0, 127);
+	// setRightSpeed(-127);
+	// sleep(290);
+	// stop();
+  autoUnfold();
   startIntake();
-	forward(20, 0, 127);
-	forward(15.3, 0, 100);
 
-	debug();
-	printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
-	turn(-42.6);
-	movedBackward(127);
-	sleep(900);
-	stop();
-	forward(-37.2, 0, 127);
-	setRightSpeed(-127);
-	sleep(290);
-	stop();
+	forward(12.8, 0, 90);
 
-
-	forward(12.4, 0, 79);
-
-	setLeftSpeed(127);
-	setRightSpeed(40);
-	sleep(150);
+	// setLeftSpeed(127);
+	// setRightSpeed(40);
+	// sleep(150);
 	forward(22.5, 0, 45);
 
 	moveForward(45);
@@ -135,20 +136,29 @@ void red2() {
   stop();
 	debug();
 }
+void realPGM() {
+  forward(20, 0, 90);
+  forward(-20, 0, 90);
+  // autoUnfold();
+}
 
 void skillsPGM() {
+
+  autoUnfold();
+  sleep(200);
+
   startIntake();
   sleep(150);
   KerainOikea.move(-127);
   CollectorLeft.move(0);
   sleep(250);
   startIntake();
-  forward(20, 0, 127);
-  forward(15.3, 0, 100); //ensimmäiset kolme kutiota on kerätty
+  forward(20, 0, 60);
+  forward(15.3, 0, 70); //ensimmäiset kolme kutiota on kerätty
 
   debug();
   printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
-  turn(42.6);
+  turn(-42.6);
   movedBackward(127);
   sleep(1000);
   stop(); // liike neljän kuution eteen
@@ -165,6 +175,7 @@ void skillsPGM() {
   moveForward(45);
   sleep(300);
   stop(); //neljä kuutiota on kerätty
+
 
   // printf("Repositioning");
   // forward(-22.6, 0, 127);

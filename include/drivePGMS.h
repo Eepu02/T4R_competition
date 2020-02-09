@@ -212,7 +212,11 @@ void arcadeDrive() {
   sleep(20);
 }
 
-void skilsDrive () { //kesken saatana
+void skillsDrive () { //kesken saatana
+
+do{
+  tankD();
+}while(!Controller1.get_digital(DIGITAL_B));
 
   startIntake();
  	sleep(250);
@@ -248,7 +252,8 @@ void skilsDrive () { //kesken saatana
  	sleep(300);
  	stop();
 
- while(1) {
+while(1){
   tankD();
 }
+
 }
