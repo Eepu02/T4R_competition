@@ -254,7 +254,7 @@ void getEncoderValues() {
 
 double lastDist = 0;
 
-double getDistance(int degrees, float d = 3.5) { //3.25
+double getDistance(int degrees, float d = 3.25) { //3.25, 3.5
   return M_PI * d * (double(degrees) / 360);
 }
 // Computes the change in orientation since last oriantation

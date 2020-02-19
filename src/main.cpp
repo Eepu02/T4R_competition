@@ -87,9 +87,17 @@ void autonomous()
 // }
 
 void opcontrol() {
-
+	turn(90);
+	sleep(500);
+	turn(-90);
+	sleep(500);
+	turn(180);
+	sleep(500);
+	turn(0);
 	while(1) {
-		tankD();
+		printTrackingValues();
+		sleep(100);
+		// tankD();
 	}
 // pros::Task my_cpp_task2 (skills_task);
 // while(!Controller1.get_digital(DIGITAL_X)) sleep(20);
