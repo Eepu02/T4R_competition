@@ -397,23 +397,48 @@ void track(void* param) {
  }
 }
 
-// double getDirection() {
-//   // Gets latest encoder values
-//   getEncoderValues();
-//
-//   // Compute change in orientation
-//   deltaHeading = getHeading();
-//
-//   // The new orientation is the previous orientation plus the change
-//   return heading += deltaHeading * (180 / M_PI);
-// }
+void advancedTrack() {
 
-// void read() {
-//   while(1) {
-//     printf("Heading toisessa paikassa: %f\n", *ptr);
-//     sleep(100);
-//   }
-// }
+  double lastHeading = heading;
+  double localX = 0;
+  double localY = 0;
+
+  while(1) {
+    er         = encoderRight.get_value();
+    el         = encoderLeft.get_value();
+    eb         = encoderBack.get_value();
+    DEr        = er - lastEr;
+    DEl        = el - lastEl;
+    DEb        = eb - lastEb;
+    lastEr     = er;
+    lastEl     = el;
+    lastEb     = eb;
+
+    double distLeft = getDistance(DEl);
+    double distRight = getDistance(DEr);
+    double distBack = getDistance(DEb);
+    double totalDistLeft = getDistance(el);
+    double totalDistRight = getDistance(er);
+    double totalDistBack = getDistance(eb);
+
+    // Compute absolute heading
+    heading = (totalDistLeft - totalDistRight) / (dl + dr);
+    double deltaHeading = heading - lastHeading;
+    // If there is no change in heading
+    if(deltaHeading == 0) {
+      localX += distBack;
+      localY += distRight;
+    }
+    else {
+      localX += 2 * sin(deltaHeading / 2) * ((distBack / deltaHeading) + db);
+      localY += 2 * sin(deltaHeading / 2) * ((distRight / deltaHeading) + dr);
+    }
+
+    lastHeading = heading;
+
+    sleep(5);
+  }
+}
 
 void turn (double targetHeading, int speed, bool slow = true) {
   double raja = 0.2;
