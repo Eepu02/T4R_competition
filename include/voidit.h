@@ -207,7 +207,7 @@ int aggCoS(int pot) {
 // Values from CAD model
 const double dr = 6.3202;
 const double dl = 7.62301;
-const double db = -3.125;
+const double db = 3.125;
 const double dm = 6.98144;
 
 // Tracking variables
@@ -221,23 +221,12 @@ int DEr        = er - lastEr;
 int DEl        = el - lastEl;
 int DEb        = eb - lastEb;
 double heading      = 0.0;
-double* ptr = &heading;
-double deltaHeading = 0.0;
 double lastSuunta   = 0.0;
 
-double r = 0;
 
 // Global x and y
-double xG = 0;
-double yG = 0;
-
-// Local x and y
-double xL = 0;
-double yL = 0;
-
-// double error;
-
-//float heading = 0.0;
+double globalX = 0;
+double globalY = 0;
 
 // Updates current and previous encoder values
 void getEncoderValues() {
@@ -271,143 +260,13 @@ double getHeading() {
   else return lastSuunta;
 }
 
-// double getMotorDistance(double ticks, float d = 4.071) {
-//   return M_PI * double(d) * (ticks / 900);
-// }
-//
-// double getMotorHeading() {
-//   double tickL = average(LeftFrontDrive.get_position(), LeftBackDrive.get_position());
-//   double tickR = average(RightFrontDrive.get_position(), RightBackDrive.get_position());
-//
-//   double distanceL = getMotorDistance(tickL);
-//   double distanceR = getMotorDistance(tickR);
-//   // printf("distanceL: %f\n", average(distanceL, distanceR));
-//   // printf("distanceR: %f\n", distanceR);
-//   return ((distanceL - distanceR) / (dm + dm));
-// }
-/* Local axis is offset from global axis by getHeading() / 2!!!*/
-void track(void* param) {
- double  globalX = 0;
- double  globalY = 0;
- double  radius  = 0;
- double lastHeading = 0;
- while (1) {
-   /*------------------------------------------------------*/
-   /*                                                      */
-   /*                      NEW VALUES                      */
-   /*                                                      */
-   /*------------------------------------------------------*/
-
-   // printf("kauha: %d\n", Lift.get_encoder_units());
-
-   // Gets latest encoder values
-   getEncoderValues();
-   heading = getHeading();
-   // Compute change in orientation
-   // deltaHeading = getHeading();
-   // // heading = getMotorHeading();
-   // // printf("Kulma: %f\n", heading * (180 / M_PI));
-   //
-   // if(fabs(deltaHeading) < 1) {
-   //
-   //   // The new orientation is the previous orientation plus the change
-   //   mutex.take(5);
-   //   heading += deltaHeading;
-   //
-   //   // printf("Kulma: %f\n", heading * (180 / M_PI));
-   //   mutex.give();
-   //
-   //   lastHeading = deltaHeading;
-   // }
-
-   // double theta = (-180*())
-
-   /*double gamma = M_PI - (M_PI/4) - (deltaHeading/2);
-
-   if(deltaHeading == 0) radius = 0;
-   else radius = (getDistance(DEr) / deltaHeading) + dr;
-
-   double line = 2* (sin(deltaHeading/2)*radius);
-
-   double currentX = line*cos(gamma);
-   double currentY = line*sin(gamma);
-
-   globalX += currentX;
-   globalY += currentY;
-
-   printf("Y: %f\n", globalY);
-   printf("X: %f\n", globalX);
-
-   //printf("X: %f\n", globalX);
-   //printf("Y: %f\n", globalY);
-   //printf(20, 160, "Y: %f", globalY);*/
-   /*------------------------------------------------------*/
-   /*                                                      */
-   /*                  LOCAL COORDINATES                   */
-   /*                                                      */
-   /*------------------------------------------------------*/
-/*
-   // Check if the orientation is the same as last cycle
-   if(lastSuunta == deltaHeading) {
-     // Left and right wheel have moved the same distance, so current oriantation is 0
-     yL = getDistance(DEr);
-
-     // Local x-position is simply the back wheel's travel distance
-     xL = getDistance(DEb);
-   }
-   else {
-     // Compute chord lenght
-     yL = 2 * sin(getHeading() / 2) * (DEr / getHeading() + dr);
-
-     //Compute global x and y
-     if(getHeading() == 0) {
-       yG = getDistance(DEl);
-     }
-     else if(getHeading() < 0) {
-       xG = yL * cos(M_PI - (getHeading() / 2) - (M_PI / 2));
-     }
-     else {
-       xG = -yL * cos(M_PI - (getHeading() / 2) - (M_PI / 2));
-     }
-     yG = yL * sin(M_PI - (getHeading() / 2) - (M_PI / 2));
-   }*/
-
-   /*------------------------------------------------------*/
-   /*                                                      */
-   /*                  GLOBAL COORDINATES                  */
-   /*                                                      */
-   /*------------------------------------------------------*/
-
-   // If global orientation is zero
-   /*if(heading == 0) {
-     xG += xL;
-     yG += yL;
-   }
-   else {
-     xG += xL * cos(deltaHeading);
-     yG += yL * sin(deltaHeading);
-   }*/
-
-   // lastSuunta = deltaHeading;
-
-   // Compute translation in local coordinates
-   //xL = 2 * sin(getHeading() / 2) * (DEb / getHeading() + db);
-   //yL = 2 * sin(getHeading() / 2) * (DEr / getHeading() + dr);
-
-   // Compute translation in global coordinates
-   //xG = xL * cos(getHeading() / 2) + yL * sin(getHeading() / 2);
-   //yG = -xL * sin(getHeading() / 2) + yL * cos(getHeading() / 2);
-
-   // Runs in 5 second intervals
-   sleep(5);
- }
-}
-
-void advancedTrack() {
+void advancedTrack(void* param) {
 
   double lastHeading = heading;
   double localX = 0;
   double localY = 0;
+  double deltaX = 0;
+  double deltaY = 0;
 
   while(1) {
     er         = encoderRight.get_value();
@@ -430,26 +289,60 @@ void advancedTrack() {
     // Compute absolute heading
     heading = (totalDistLeft - totalDistRight) / (dl + dr);
     double deltaHeading = heading - lastHeading;
+    // printf("Delta heading: %f", deltaHeading);
+    // printf("Heading: %f\n", heading);
     // If there is no change in heading
     if(deltaHeading == 0) {
-      localX += distBack;
-      localY += distRight;
+      // printf("Heading is zero.\n");
+      deltaX = distBack;
+      deltaY = distRight;
     }
+
+    // Otherwise compute new change in position
     else {
-      localX += 2 * sin(deltaHeading / 2) * ((distBack / deltaHeading) + db);
-      localY += 2 * sin(deltaHeading / 2) * ((distRight / deltaHeading) + dr);
+      deltaX = (2 * sin(deltaHeading / 2)) * ((distBack / deltaHeading) + db);
+      deltaY = (2 * sin(deltaHeading / 2)) * ((distRight / deltaHeading) + dr);
+
+      // printf("deltaX: %f	", deltaX);
+      // printf("deltaY: %f\n", deltaY);
+
+      double avgHeading = deltaHeading / 2;
+
+      // printf("avgHeading: %f\n", avgHeading);
+
+      //Convert to polar coordinates
+      double polarRadius = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+      double polarTheta = atan(deltaY / deltaX);
+
+      // Rotate by average rotation to counter assumption in previous caclulations
+      polarTheta += avgHeading;
+
+      //Convert back to cartesian coordinates
+      deltaX = cos(polarTheta) * polarRadius;
+      deltaY = sin(polarTheta) * polarRadius;
     }
+    printf("Deltay: %f\n", deltaY);
+
+    globalX += deltaX;
+    globalY += deltaY;
+
+    // printf("Global X: %f	", globalX);
+    // printf("Global Y: %f\n", globalY);
 
     lastHeading = heading;
 
     sleep(5);
   }
-  
+}
+
 void printTrackingValues() {
   printf("Encoder right: %d\n", er);
   printf("Distance right: %f\n", getDistance(er));
   printf("Encoder left: %d\n", el);
   printf("Distance left: %f\n", getDistance(el));
+  printf("Encoder back: %d\n", eb);
+  printf("Distance back: %f\n", getDistance(eb));
+  printf("Heading: %f\n", heading);
   printf("Heading in degrees: %f\n", heading * (180 / M_PI));
 }
 
@@ -568,12 +461,12 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
     }
     else minSpeed = nopeus;
     moveForward(speed);
-    printf("Error: %f ", error);
-    printf("Current distance: %f  ", currentDistance);
-    printf("Speed: %f ", speed);
-    printf("Encoder left: %d  ", el);
-    printf("Encoder right: %d ", er);
-    printf("Heading (deg): %f\n", heading * (180 / M_PI));
+    // printf("Error: %f ", error);
+    // printf("Current distance: %f  ", currentDistance);
+    // printf("Speed: %f ", speed);
+    // printf("Encoder left: %d  ", el);
+    // printf("Encoder right: %d ", er);
+    // printf("Heading (deg): %f\n", heading * (180 / M_PI));
 
 
     increment++;

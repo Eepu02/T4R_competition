@@ -13,7 +13,7 @@ void initialize() {
 	setup();
 	resetEncoders();
 
-	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
+	pros::Task track_task (advancedTrack, (void*)"HELLO WORLD", 10,
 								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
 
 	pros::Task my_cpp_task (track_task);
@@ -87,21 +87,12 @@ void autonomous()
 // }
 
 void opcontrol() {
-	turn(90);
-	sleep(500);
-	turn(-90);
-	sleep(500);
-	turn(180);
-	sleep(500);
-	turn(0);
-	while(1) {
-		printTrackingValues();
-		sleep(100);
-		// tankD();
-	}
-// pros::Task my_cpp_task2 (skills_task);
-// while(!Controller1.get_digital(DIGITAL_X)) sleep(20);
-// my_cpp_task2().remove();
-// skillsPGM();
-// skillsDrive();
+	sleep(100);
+	printTrackingValues();
+	printf("Global X: %f	", globalX);
+	printf("Global Y: %f\n", globalY);
+	forward(10, 0, 50);
+	printTrackingValues();
+	printf("Global X: %f	", globalX);
+	printf("Global Y: %f\n", globalY);
 }
