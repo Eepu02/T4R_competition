@@ -11,6 +11,14 @@ void initialize() {
 	//pros::lcd::initialize();
 	//pros::lcd::print(0, "%d\n", encoderBack.get_value());
 	setup();
+	resetEncoders();
+
+	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
+								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
+
+	pros::Task my_cpp_task (track_task);
+
+	// pros::Task skills_task (skillsPGM, (void*)"HELLO WORLD", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Skills auto");
 
 }
 
@@ -50,38 +58,12 @@ void competition_initialize() {
 
 void autonomous()
 {
-	// Create tracking task with a priority of 10 (default 8);
-	pros::Task track_task (track, (void*)"HELLO WORLD", 10,
-								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
 	//autoUnfold();
-
-	pros::Task my_cpp_task (track_task);
-
-	turn(-80.5, 127,true); //80.5 oikealle, systemaattinen virhe
-	// autoUnfold();
-	//
-	// startIntake();
-	// moveForward(50);
-	// sleep(1500);
-	// stopIntake();
-	// movedBackward(60);
-	// sleep(1500);
-	// turnLeft(60);
-	// sleep(1600);
-	// moveForward(60);
-	// sleep(2000);
-	// reverseIntake();
-	// sleep(500);
-	// turnLeft(60);
-	// sleep(500);
-	// movedBackward(100);
-	// sleep(750);
-	// stop();
-	// stopIntake();
-
+	 // red2();
+	// skillsPGM();
+	realPGM();
 
 }
-
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -105,15 +87,21 @@ void autonomous()
 // }
 
 void opcontrol() {
-
-	//resetEncoders();
-
-//	turn(90, 127);
-	//sesamOpen();
-	//read();
-	while(1)	{
-	 	// int potVal = PotRN.get_value();
-	 	// printf("nostin: %d\n", Nostin.get_encoder_units());
- 		tankD();
+	turn(90);
+	sleep(500);
+	turn(-90);
+	sleep(500);
+	turn(180);
+	sleep(500);
+	turn(0);
+	while(1) {
+		printTrackingValues();
+		sleep(100);
+		// tankD();
 	}
+// pros::Task my_cpp_task2 (skills_task);
+// while(!Controller1.get_digital(DIGITAL_X)) sleep(20);
+// my_cpp_task2().remove();
+// skillsPGM();
+// skillsDrive();
 }

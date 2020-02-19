@@ -19,13 +19,8 @@ bool SecConDrivSide = false;
 
 // rampin nostimen muuttujat
 int rnSpeed;
-int maxVal = 3410; //max valur of RN
 int hidVal = 2360;
 int alVal = 1050;
-
-int CoS()  {
-  return round((maxVal - PotRN.get_value()) * 0.091);
-}
 
 
 //nostimen muuttujat
@@ -85,7 +80,7 @@ void tankD()  {
     // kerääjän liike
     // collector movement
 
-    if (PotRN.get_value() > hidVal) rnSpeed = CoS();
+    if (PotRN.get_value() > hidVal) rnSpeed = CoS(PotRN.get_value());
     else rnSpeed = 127;
 
     if (firConCollector && Controller1.get_digital(DIGITAL_R1)) startIntake(rnSpeed);
@@ -107,7 +102,7 @@ void tankD()  {
 
     // rampin nostimen liike
 
-    if(PotRN.get_value() > hidVal)  rnSpeed = CoS();
+    if(PotRN.get_value() > hidVal)  rnSpeed = CoS(PotRN.get_value());
     else rnSpeed = 127;
 
     if(firConRN && Controller1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
@@ -202,7 +197,7 @@ void arcadeDrive() {
 
       // rampin nostimen liike
 
-      if(PotRN.get_value() > hidVal)  rnSpeed = CoS();
+      if(PotRN.get_value() > hidVal)  rnSpeed = CoS(PotRN.get_value());
       else rnSpeed = 127;
 
       if(firConRN && Controller1.get_digital(DIGITAL_UP) &&  PotRN.get_value() < maxVal) raiseTray(rnSpeed);
@@ -215,4 +210,50 @@ void arcadeDrive() {
 
 
   sleep(20);
+}
+
+void skillsDrive () { //kesken saatana
+
+do{
+  tankD();
+}while(!Controller1.get_digital(DIGITAL_B));
+
+  startIntake();
+ 	sleep(250);
+ 	KerainOikea.move(-127);
+ 	CollectorLeft.move(0);
+ 	sleep(150);
+ 	startIntake();
+ 	forward(20, 0, 127);
+ 	forward(15.3, 0, 100);
+
+ 	debug();
+ 	printf("Recalculated heading in degrees: %f\n", ((getDistance(el) - getDistance(er)) / (dr + dl)) * (180 / M_PI));
+ 	turn(-42.6);
+
+ 	movedBackward(127);
+ 	sleep(1000);
+ 	stop();
+ 	printf("menossa\n");
+ 	forward(-37.2, 0, 127);
+ 	printf("eiNiinMenossa\n");
+ 	setRightSpeed(-127);
+ 	sleep(290);
+ 	stop();
+
+ 	forward(12.4, 0, 79);
+
+ 	setLeftSpeed(127);
+ 	setRightSpeed(40);
+ 	sleep(150);
+ 	forward(22.5, 0, 45);
+
+ 	moveForward(45);
+ 	sleep(300);
+ 	stop();
+
+while(1){
+  tankD();
+}
+
 }
