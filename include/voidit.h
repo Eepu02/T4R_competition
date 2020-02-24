@@ -23,9 +23,12 @@ void sleep (int x)
 
 // Resets all tracking wheels
 void resetEncoders() {
-  encoderBack.reset();
-  encoderLeft.reset();
-  encoderRight.reset();
+  while(encoderBack.get_value() != 0 || encoderLeft.get_value() != 0 || encoderRight.get_value() != 0) {
+    encoderBack.reset();
+    encoderLeft.reset();
+    encoderRight.reset();
+    sleep(5);
+  }
 }
 
 // Resets all drive motor internal encoders
@@ -321,7 +324,7 @@ void advancedTrack(void* param) {
       deltaX = cos(polarTheta) * polarRadius;
       deltaY = sin(polarTheta) * polarRadius;
     }
-    printf("Deltay: %f\n", deltaY);
+    // printf("Deltay: %f\n", deltaY);
 
     globalX += deltaX;
     globalY += deltaY;
