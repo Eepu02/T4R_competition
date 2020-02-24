@@ -86,6 +86,11 @@ void autonomous()
 // }
 
 void opcontrol() {
+	resetEncoders();
+	while(1) {
+		printTrackingValues();
+		sleep(100);
+	}
 	sleep(100);
 	printTrackingValues();
 	printf("Global X: %f	", globalX);

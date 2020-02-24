@@ -329,8 +329,14 @@ void advancedTrack(void* param) {
     globalX += deltaX;
     globalY += deltaY;
 
-    // printf("Global X: %f	", globalX);
-    // printf("Global Y: %f\n", globalY);
+    double lastX;
+    double lastY;
+
+    // if(lastX != globalX) printf("Global X: %f	", globalX);
+    // if(lastY != globalY) printf("Global Y: %f\n", globalY);
+
+    lastX = globalX;
+    lastY = globalY;
 
     lastHeading = heading;
 
@@ -347,6 +353,8 @@ void printTrackingValues() {
   printf("Distance back: %f\n", getDistance(eb));
   printf("Heading: %f\n", heading);
   printf("Heading in degrees: %f\n", heading * (180 / M_PI));
+  printf("Global x: %f\n", globalX);
+  printf("Global y: %f\n", globalY);
 }
 
 void debug() {
@@ -464,12 +472,12 @@ void forward(float targetDistance, int angle, int nopeus, bool deaccelerate = tr
     }
     else minSpeed = nopeus;
     moveForward(speed);
-    // printf("Error: %f ", error);
-    // printf("Current distance: %f  ", currentDistance);
-    // printf("Speed: %f ", speed);
-    // printf("Encoder left: %d  ", el);
-    // printf("Encoder right: %d ", er);
-    // printf("Heading (deg): %f\n", heading * (180 / M_PI));
+    printf("Error: %f ", error);
+    printf("Current distance: %f  ", currentDistance);
+    printf("Speed: %f ", speed);
+    printf("Encoder left: %d  ", el);
+    printf("Encoder right: %d ", er);
+    printf("Heading (deg): %f\n", heading * (180 / M_PI));
 
 
     increment++;
