@@ -13,10 +13,9 @@ void initialize() {
 	setup();
 	resetEncoders();
 
-	pros::Task track_task (advancedTrack, (void*)"HELLO WORLD", 10,
-								TASK_STACK_DEPTH_DEFAULT, "Tracking task");
+	pros::Task track_task(advancedTrack);
 
-	pros::Task my_cpp_task (track_task);
+	// pros::Task my_cpp_task (track_task);
 
 	// pros::Task skills_task (skillsPGM, (void*)"HELLO WORLD", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Skills auto");
 
@@ -95,4 +94,5 @@ void opcontrol() {
 	printTrackingValues();
 	printf("Global X: %f	", globalX);
 	printf("Global Y: %f\n", globalY);
+	while(1) sleep(100);
 }
