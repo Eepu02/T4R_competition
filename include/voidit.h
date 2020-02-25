@@ -308,30 +308,40 @@ void advancedTrack(void* param) {
 
       // printf("deltaX: %f	", deltaX);
       // printf("deltaY: %f\n", deltaY);
-
-      double avgHeading = deltaHeading / 2;
-
-      // printf("avgHeading: %f\n", avgHeading);
-
-      //Convert to polar coordinates
-      double polarRadius = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
-      double polarTheta = atan(deltaY / deltaX);
-
-      // Rotate by average rotation to counter assumption in previous caclulations
-      polarTheta += avgHeading;
-
-      //Convert back to cartesian coordinates
-      deltaX = cos(polarTheta) * polarRadius;
-      deltaY = sin(polarTheta) * polarRadius;
     }
+    double avgHeading = deltaHeading / 2;
+
+    // printf("avgHeading: %f\n", avgHeading);
+
+    //Convert to polar coordinates
+    double polarRadius = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+    double polarTheta;
+
+    //Special case for 90 degree angle
+    if(deltaX == 0) polarTheta = M_PI / 2;
+    else polarTheta = atan(deltaY / deltaX);
+
+    // Rotate by average rotation to counter assumption in previous caclulations
+    polarTheta += avgHeading;
+
+    //Convert back to cartesian coordinates
+    deltaX = cos(polarTheta) * polarRadius;
+    deltaY = sin(polarTheta) * polarRadius;
     // printf("Deltay: %f\n", deltaY);
+
+    // printf("deltaX: %f	", deltaX);
+    // printf("deltaY: %f\n", deltaY);
 
     globalX += deltaX;
     globalY += deltaY;
 
     double lastX;
     double lastY;
+    double lastdx;
+    double lastdy;
 
+    if(lastdx != deltaX) printf("Delta X: %f	", deltaX);
+    if(lastdy != deltaY) printf("Delta Y: %f\n", deltaY);
     // if(lastX != globalX) printf("Global X: %f	", globalX);
     // if(lastY != globalY) printf("Global Y: %f\n", globalY);
 
