@@ -214,15 +214,15 @@ const double db = 3.125;
 const double dm = 6.98144;
 
 // Tracking variables
-int er         = 0;
-int el         = 0;
-int eb         = 0;
-int lastEr     = 0;
-int lastEl     = 0;
-int lastEb     = 0;
-int DEr        = er - lastEr;
-int DEl        = el - lastEl;
-int DEb        = eb - lastEb;
+int er              = 0;
+int el              = 0;
+int eb              = 0;
+int lastEr          = 0;
+int lastEl          = 0;
+int lastEb          = 0;
+int DEr             = er - lastEr;
+int DEl             = el - lastEl;
+int DEb             = eb - lastEb;
 double heading      = 0.0;
 double lastSuunta   = 0.0;
 
