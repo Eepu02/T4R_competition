@@ -223,13 +223,13 @@ int lastEb          = 0;
 int DEr             = er - lastEr;
 int DEl             = el - lastEl;
 int DEb             = eb - lastEb;
-double heading      = 0.0;
-double lastSuunta   = 0.0;
+long double heading      = 0.0;
+long double lastSuunta   = 0.0;
 
 
 // Global x and y
-double globalX = 0;
-double globalY = 0;
+long double globalX = 0;
+long double globalY = 0;
 
 // Updates current and previous encoder values
 void getEncoderValues() {
@@ -244,18 +244,18 @@ void getEncoderValues() {
   lastEb     = eb;
 }
 
-double lastDist = 0;
+long double lastDist = 0;
 
-double getDistance(int degrees, float d = 3.25) { //3.25, 3.5
+long double getDistance(int degrees, float d = 3.25) { //3.25, 3.5
   return M_PI * d * (double(degrees) / 360);
 }
 // Computes the change in orientation since last oriantation
-double getHeading() {
+long double getHeading() {
   // Degress
   //return (-180 * (getDistance(DEl) - getDistance(DEr))) / ((dl - dr) * M_PI);
 
   //Radians
-  double currentVal = (getDistance(el) - getDistance(er)) / (dr + dl);
+  long double currentVal = (getDistance(el) - getDistance(er)) / (dr + dl);
   if(fabs(currentVal - lastSuunta) < 1) {
     lastSuunta = currentVal;
     return currentVal;
@@ -265,11 +265,9 @@ double getHeading() {
 
 void advancedTrack(void* param) {
 
-  double lastHeading = heading;
-  double localX = 0;
-  double localY = 0;
-  double deltaX = 0;
-  double deltaY = 0;
+  long double lastHeading = heading;
+  long double deltaX = 0;
+  long double deltaY = 0;
 
   while(1) {
     er         = encoderRight.get_value();
@@ -282,16 +280,16 @@ void advancedTrack(void* param) {
     lastEl     = el;
     lastEb     = eb;
 
-    double distLeft = getDistance(DEl);
-    double distRight = getDistance(DEr);
-    double distBack = getDistance(DEb);
-    double totalDistLeft = getDistance(el);
-    double totalDistRight = getDistance(er);
-    double totalDistBack = getDistance(eb);
+    long double distLeft = getDistance(DEl);
+    long double distRight = getDistance(DEr);
+    long double distBack = getDistance(DEb);
+    long double totalDistLeft = getDistance(el);
+    long double totalDistRight = getDistance(er);
+    long double totalDistBack = getDistance(eb);
 
     // Compute absolute heading
     heading = (totalDistLeft - totalDistRight) / (dl + dr);
-    double deltaHeading = heading - lastHeading;
+    long double deltaHeading = heading - lastHeading;
     // printf("Delta heading: %f", deltaHeading);
     // printf("Heading: %f\n", heading);
     // If there is no change in heading
@@ -306,44 +304,56 @@ void advancedTrack(void* param) {
       deltaX = (2 * sin(deltaHeading / 2)) * ((distBack / deltaHeading) + db);
       deltaY = (2 * sin(deltaHeading / 2)) * ((distRight / deltaHeading) + dr);
 
+      long double avgHeading = deltaHeading / 2;
+
+      // printf("avgHeading: %f\n", avgHeading);
+
+      //Convert to polar coordinates
+      long double polarRadius = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+      long double polarTheta;
+
+      //Special case for 90 degree angle
+      if(deltaX == 0) polarTheta = M_PI / 2;
+      else polarTheta = atan(deltaY / deltaX);
+
+      // Rotate by average rotation to counter assumption in previous caclulations
+      polarTheta -= avgHeading;
+
+      //Convert back to cartesian coordinates
+      deltaX = cos(polarTheta) * polarRadius;
+      deltaY = sin(polarTheta) * polarRadius;
+
       // printf("deltaX: %f	", deltaX);
       // printf("deltaY: %f\n", deltaY);
     }
-    double avgHeading = deltaHeading / 2;
 
-    // printf("avgHeading: %f\n", avgHeading);
+    long double addAngle;
+    if(deltaX > 0) addAngle = -M_PI / 2;
+    else if(deltaX < 0) addAngle = M_PI / 2;
+    else addAngle = 0;
 
-    //Convert to polar coordinates
-    double polarRadius = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
-    double polarTheta;
+    // Convert to global coordinates
+    // If either deltaX or deltaY is zero, the multiplication will results in 0 and thus having no effect
+    globalX += sin(heading) * deltaY + sin(heading + addAngle) * deltaX;
+    globalY += cos(heading) * deltaY + cos(heading + addAngle) * deltaX;
 
-    //Special case for 90 degree angle
-    if(deltaX == 0) polarTheta = M_PI / 2;
-    else polarTheta = atan(deltaY / deltaX);
-
-    // Rotate by average rotation to counter assumption in previous caclulations
-    polarTheta += avgHeading;
-
-    //Convert back to cartesian coordinates
-    deltaX = cos(polarTheta) * polarRadius;
-    deltaY = sin(polarTheta) * polarRadius;
     // printf("Deltay: %f\n", deltaY);
 
     // printf("deltaX: %f	", deltaX);
     // printf("deltaY: %f\n", deltaY);
 
-    globalX += deltaX;
-    globalY += deltaY;
+    // globalX += deltaX;
+    // globalY += deltaY;
 
-    double lastX;
-    double lastY;
-    double lastdx;
-    double lastdy;
+    long double lastX;
+    long double lastY;
+    long double lastdx;
+    long double lastdy;
 
-    if(lastdx != deltaX) printf("Delta X: %f	", deltaX);
-    if(lastdy != deltaY) printf("Delta Y: %f\n", deltaY);
-    // if(lastX != globalX) printf("Global X: %f	", globalX);
-    // if(lastY != globalY) printf("Global Y: %f\n", globalY);
+    // if(lastdx != deltaX) printf("Delta X: %f	", deltaX);
+    // if(lastdy != deltaY) printf("Delta Y: %f\n", deltaY);
+    if(lastX != globalX) printf("Global X: %Lf	", globalX);
+    if(lastY != globalY) printf("Global Y: %Lf\n", globalY);
 
     lastX = globalX;
     lastY = globalY;
@@ -356,15 +366,15 @@ void advancedTrack(void* param) {
 
 void printTrackingValues() {
   printf("Encoder right: %d\n", er);
-  printf("Distance right: %f\n", getDistance(er));
+  printf("Distance right: %Lf\n", getDistance(er));
   printf("Encoder left: %d\n", el);
-  printf("Distance left: %f\n", getDistance(el));
+  printf("Distance left: %Lf\n", getDistance(el));
   printf("Encoder back: %d\n", eb);
-  printf("Distance back: %f\n", getDistance(eb));
-  printf("Heading: %f\n", heading);
-  printf("Heading in degrees: %f\n", heading * (180 / M_PI));
-  printf("Global x: %f\n", globalX);
-  printf("Global y: %f\n", globalY);
+  printf("Distance back: %Lf\n", getDistance(eb));
+  printf("Heading: %Lf\n", heading);
+  printf("Heading in degrees: %Lf\n", heading * (180 / M_PI));
+  printf("Global x: %Lf\n", globalX);
+  printf("Global y: %Lf\n", globalY);
 }
 
 void debug() {

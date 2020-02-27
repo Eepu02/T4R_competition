@@ -89,7 +89,7 @@ void opcontrol() {
 	// turn(90);
 	resetEncoders();
 	while(1) {
-		printTrackingValues();
+		// printTrackingValues();
 		sleep(100);
 	}
 	sleep(100);
