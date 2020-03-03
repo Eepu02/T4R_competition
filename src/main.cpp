@@ -89,8 +89,9 @@ void opcontrol() {
 	// turn(90);
 	resetEncoders();
 	while(1) {
+		tankD();
 		// printTrackingValues();
-		sleep(100);
+		// sleep(10	0);
 	}
 	sleep(100);
 	printTrackingValues();
